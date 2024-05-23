@@ -1,3 +1,4 @@
+# Import Relevant Libraries
 import os
 import re
 import copy
@@ -8,6 +9,7 @@ import torch
 from torch.utils.data import dataset, dataloader
 import transformers
 
+# Training Dataset
 train_file = 'parsing.txt'
 
 # Parsing the file
@@ -39,3 +41,8 @@ def parse_dataset(lines):
 lines = read_dataset(train_file)
 sentences, annotations = parse_dataset(lines)
 
+# Tokenize the data (Assign labels to the correct tokens)
+
+# Preprocessing the data
+
+# Training the data
