@@ -41,8 +41,19 @@ def parse_dataset(lines):
 lines = read_dataset(train_file)
 sentences, annotations = parse_dataset(lines)
 
-# Tokenize the data (Assign labels to the correct tokens)
+# for i in sentences:
+#     print(i)
+# for j in annotations:
+#     print (j)
 
+def tag_annotations(sentences, annotations):
+    tagged_sentences = []
+    for sentence in sentences:
+        tags = ['O'] * len(sentence)
+        for annotation in annotations:
+            descript_ID, start, end, disease, disease_label, disease_ID = annotation
+            start = int(start)
+            end = int(end)
 # Preprocessing the data
 
 # Training the data
