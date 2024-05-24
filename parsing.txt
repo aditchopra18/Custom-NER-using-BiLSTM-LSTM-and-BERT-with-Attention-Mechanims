@@ -15,3 +15,19 @@
 10192393	1312	1326	pilomatricomas	SpecificDisease	D018296
 10192393	1385	1392	tumours	DiseaseClass	D009369
 10192393	1615	1622	tumours	DiseaseClass	D009369
+
+10194428|t|HFE mutations analysis in 711 hemochromatosis probands: evidence for S65C implication in mild form of hemochromatosis.
+10194428|a|Hereditary hemochromatosis (HH) is a common autosomal recessive genetic disorder of iron metabolism. The HFE candidate gene encoding an HLA class I-like protein involved in HH was identified in 1996. Two missense mutations have been described  C282Y, accounting for 80% to 90% of HH chromosomes, and H63D, which is associated with a milder form of the disease representing 40% to 70% of non-C282Y HH chromosomes. We report here on the analysis of C282Y, H63D, and the 193A-- > T substitution leading to the S65C missense substitution in a large series of probands and controls. The results confirm that the C282Y substitution was the main mutation involved in hemochromatosis, accounting for 85% of carrier chromosomes, whereas the H63D substitution represented 39% of the HH chromosomes that did not carry the C282Y mutation. In addition, our screening showed that the S65C substitution was significantly enriched in probands with at least one chromosome without an assigned mutation. This substitution accounted for 7. 8% of HH chromosomes that were neither C282Y nor H63D. This enrichment of S65C among HH chromosomes suggests that the S65C substitution is associated with the mild form of hemochromatosis. 
+10194428	30	45	hemochromatosis	Modifier	D016399
+10194428	102	117	hemochromatosis	SpecificDisease	D006432
+10194428	119	145	Hereditary hemochromatosis	SpecificDisease	D006432
+10194428	147	149	HH	SpecificDisease	D006432
+10194428	163	199	autosomal recessive genetic disorder	DiseaseClass	D030342
+10194428	292	294	HH	SpecificDisease	D006432
+10194428	399	401	HH	Modifier	D006432
+10194428	516	518	HH	Modifier	D006432
+10194428	779	794	hemochromatosis	SpecificDisease	D006432
+10194428	892	894	HH	Modifier	D006432
+10194428	1146	1148	HH	Modifier	D006432
+10194428	1225	1227	HH	Modifier	D006432
+10194428	1312	1327	hemochromatosis	SpecificDisease	D006432
