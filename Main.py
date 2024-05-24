@@ -6,10 +6,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import transformers
 
-# Training Dataset
-train_file = 'parsing.txt'  # Adjust path if necessary
-
-# Parsing the file
+train_file = 'parsing.txt'
 def read_dataset(file_path):
     with open(file_path, "r") as file:
         lines = file.readlines()
@@ -44,7 +41,7 @@ def parse_paragraph(paragraph):
             if sentence:
                 sentences.append(sentence)
                 sentence = []
-            text += line.split('|')[2] + ' '  # Concatenate lines with a space
+            text += line.split('|')[2] + ' '
             sentence.extend(line.split('|')[2].split())
         elif re.match(r'^\d+\t\d+\t\d+\t', line):
             start, end = int(line.split("\t")[1]), int(line.split("\t")[2])
@@ -61,11 +58,11 @@ def tag_annotations(sentences, annotations):
     char_count = 0
     
     for sentence in sentences:
-        tags = ['O'] * len(sentence)  # Start with all words tagged as 'O'
+        tags = ['O'] * len(sentence)
         
         for i, word in enumerate(sentence):
             word_start = char_count
-            char_count += len(word) + 1  # +1 for the space between words
+            char_count += len(word) + 1
             word_end = char_count - 1
 
             for annotation in annotations:
