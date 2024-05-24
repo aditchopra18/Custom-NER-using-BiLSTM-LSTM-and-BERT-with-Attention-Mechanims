@@ -5,12 +5,17 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
 import transformers
+import string
 
 train_file = 'parsing.txt'
 def read_dataset(file_path):
     with open(file_path, "r") as file:
         lines = file.readlines()
     return lines
+
+def remove_punctuations(strings):
+    translator = str.maketrans('', '', string.punctuation)
+    return [s.translate(translator) for s in strings]
 
 def parse_dataset(lines):
     paragraphs = []
@@ -50,7 +55,6 @@ def parse_paragraph(paragraph):
 
     if sentence:
         sentences.append(sentence)
-
     return sentences, annotations
 
 def tag_annotations(sentences, annotations):
@@ -58,15 +62,15 @@ def tag_annotations(sentences, annotations):
     char_count = 0
     
     for sentence in sentences:
-        tags = ['O'] * len(sentence)
-        
-        for i, word in enumerate(sentence):
+        edited_sent = remove_punctuations(sentence)        
+        tags = ['O'] * len(edited_sent)
+        for i, word in enumerate(edited_sent):
             word_start = char_count
             char_count += len(word) + 1
             word_end = char_count - 1
 
             for annotation in annotations:
-                start, end, _, label = annotation
+                start, end, disease_info, label = annotation
                 if word_start >= start and word_end <= end:
                     tags[i] = 'I-' + label
         
@@ -84,7 +88,6 @@ for paragraph in paragraphs:
     tagged_sentences = tag_annotations(sentences, annotations)
     all_tagged_sentences.extend(tagged_sentences)
 
-# Save the tagged sentences to a new file
 output_file = 'Tagged_File.txt'
 with open(output_file, 'w') as file:
     for sentence, tags in all_tagged_sentences:
