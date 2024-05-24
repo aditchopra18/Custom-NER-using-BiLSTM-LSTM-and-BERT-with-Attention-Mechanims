@@ -41,6 +41,7 @@ def parse_dataset(lines):
 lines = read_dataset(train_file)
 sentences, annotations = parse_dataset(lines)
 
+# Debug print
 # for i in sentences:
 #     print(i)
 # for j in annotations:
@@ -54,6 +55,28 @@ def tag_annotations(sentences, annotations):
             descript_ID, start, end, disease, disease_label, disease_ID = annotation
             start = int(start)
             end = int(end)
+    # Creating tag file based on character limits in the dataset file
+    # using the IOB tagging scheme
+            count_char = 0
+            # Correctly assigning the entites with custom tags
+            for i, words in enumerate(sentence):
+                count_char += len(words) + 1
+                if count_char > start and count_char <= end:
+                    tags[i] = "I-" + disease_label
+        tagged_sentences.append((sentence, tags))
+    
+    return tagged_sentences
+
+tagged_sentences = tag_annotations(sentences, annotations)
+
+# Saving the tagged sentences in a different file    
+output_tag_file = 'Tagged_File.txt'
+with open(output_tag_file, 'w') as output_file:
+    for s, a in tagged_sentences:
+        for word, tag in zip(s, a):
+            output_file.write(f'{word}\t{tag}\n')
+    output_file.write('\n')    
+
 # Preprocessing the data
 
 # Training the data
