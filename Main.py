@@ -37,15 +37,19 @@ def parse_paragraph(paragraph):
     sentences = []
     annotations = []
     sentence = []
+    text = ""
     
     for line in paragraph:
         if re.match(r'^\d+\|\w\|', line):
             if sentence:
                 sentences.append(sentence)
                 sentence = []
+            text += line.split('|')[2] + ' '  # Concatenate lines with a space
             sentence.extend(line.split('|')[2].split())
         elif re.match(r'^\d+\t\d+\t\d+\t', line):
-            annotations.append(line.split("\t"))
+            start, end = int(line.split("\t")[1]), int(line.split("\t")[2])
+            text_segment = text[start:end]
+            annotations.append((start, end, line.split("\t")[3], line.split("\t")[4]))
 
     if sentence:
         sentences.append(sentence)
@@ -54,19 +58,23 @@ def parse_paragraph(paragraph):
 
 def tag_annotations(sentences, annotations):
     tagged_sentences = []
+    char_count = 0
+    
     for sentence in sentences:
         tags = ['O'] * len(sentence)  # Start with all words tagged as 'O'
-        for annotation in annotations:
-            doc_id, start, end, text, label, _ = annotation
-            start, end = int(start), int(end)
-            char_count = 0
-            for i, word in enumerate(sentence):
-                word_start = char_count
-                char_count += len(word) + 1  # +1 for the space between words
-                word_end = char_count - 1
+        
+        for i, word in enumerate(sentence):
+            word_start = char_count
+            char_count += len(word) + 1  # +1 for the space between words
+            word_end = char_count - 1
+
+            for annotation in annotations:
+                start, end, _, label = annotation
                 if word_start >= start and word_end <= end:
                     tags[i] = 'I-' + label
+        
         tagged_sentences.append((sentence, tags))
+        
     return tagged_sentences
 
 lines = read_dataset(train_file)
