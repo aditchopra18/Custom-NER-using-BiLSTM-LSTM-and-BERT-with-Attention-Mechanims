@@ -1,16 +1,13 @@
-# Import Relevant Libraries
 import os
 import re
-import copy
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import torch
-from torch.utils.data import dataset, dataloader
+from torch.utils.data import Dataset, DataLoader
 import transformers
 
 # Training Dataset
-train_file = 'parsing.txt'
+train_file = 'parsing.txt'  # Adjust path if necessary
 
 # Parsing the file
 def read_dataset(file_path):
@@ -30,7 +27,7 @@ def parse_dataset(lines):
             if paragraph:
                 paragraphs.append(paragraph)
                 paragraph = []
-        
+
     if paragraph:
         paragraphs.append(paragraph)
 
@@ -40,52 +37,40 @@ def parse_paragraph(paragraph):
     sentences = []
     annotations = []
     sentence = []
-
+    
     for line in paragraph:
         if re.match(r'^\d+\|\w\|', line):
             if sentence:
                 sentences.append(sentence)
                 sentence = []
             sentence.extend(line.split('|')[2].split())
-        
         elif re.match(r'^\d+\t\d+\t\d+\t', line):
             annotations.append(line.split("\t"))
-    
+
     if sentence:
         sentences.append(sentence)
+
     return sentences, annotations
-
-lines = read_dataset(train_file)
-paragraphs = parse_dataset(lines)
-sentences, annotations = parse_paragraph(paragraphs)
-
-# Debug print
-# for i in sentences:
-#     print(i)
-# for j in annotations:
-#     print (j)
 
 def tag_annotations(sentences, annotations):
     tagged_sentences = []
     for sentence in sentences:
-        tags = ['O'] * len(sentence)
+        tags = ['O'] * len(sentence)  # Start with all words tagged as 'O'
         for annotation in annotations:
-            descript_ID, start, end, disease, disease_label, disease_ID = annotation
-            start = int(start)
-            end = int(end)
-    # Creating tag file based on character limits in the dataset file
-    # using the IO tagging scheme
-            count_char = 0
-            # Correctly assigning the entites with custom tags
-            for i, words in enumerate(sentence):
-                word_start = count_char
-                count_char += len(words) + 1
-                word_end = count_char - 1
-                if word_start > start and word_end <= end:
-                    tags[i] = "I-" + disease_label
+            doc_id, start, end, text, label, _ = annotation
+            start, end = int(start), int(end)
+            char_count = 0
+            for i, word in enumerate(sentence):
+                word_start = char_count
+                char_count += len(word) + 1  # +1 for the space between words
+                word_end = char_count - 1
+                if word_start >= start and word_end <= end:
+                    tags[i] = 'I-' + label
         tagged_sentences.append((sentence, tags))
-    
     return tagged_sentences
+
+lines = read_dataset(train_file)
+paragraphs = parse_dataset(lines)
 
 all_tagged_sentences = []
 
@@ -94,14 +79,10 @@ for paragraph in paragraphs:
     tagged_sentences = tag_annotations(sentences, annotations)
     all_tagged_sentences.extend(tagged_sentences)
 
-# Saving the tagged sentences in a different file    
-output_tag_file = 'Tagged_File.txt'
-with open(output_tag_file, 'w') as output_file:
-    for s, a in all_tagged_sentences:
-        for word, tag in zip(s, a):
-            output_file.write(f'{word}\t{tag}\n')
-    output_file.write('\n')    
-
-# # Preprocessing the data
-
-# # Training the data
+# Save the tagged sentences to a new file
+output_file = 'Tagged_File.txt'
+with open(output_file, 'w') as file:
+    for sentence, tags in all_tagged_sentences:
+        for word, tag in zip(sentence, tags):
+            file.write(f'{word}\t{tag}\n')
+        file.write('\n')
