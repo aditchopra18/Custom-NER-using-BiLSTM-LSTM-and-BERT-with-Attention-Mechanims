@@ -1,15 +1,12 @@
-# Importing the relevant libraries
-import os
+# Import the Relevant Libraries
 import re
-import string
 import torch
+import torch.nn as nn
+import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
-from transformers import BertTokenizer, BertForTokenClassification
+from sklearn.preprocessing import LabelEncoder
 
-# Defining the Training and Testing Files
 train_file = 'NCBItrainset_corpus.txt'
-test_file = 'NCBItestset_corpus.txt'
-model = 'bert-base-uncased'
 
 # Reading the dataset file
 def read_dataset(file_path):
@@ -86,26 +83,85 @@ def tag_annotations(sentences, annotations):
 lines = read_dataset(train_file)
 paragraphs = parse_dataset(lines)
 
-all_tagged_sentences = []
+all_sentences = []
+all_tags = []
 
 for paragraph in paragraphs:
-    sentences, annotations= parse_paragraph(paragraph)
+    sentences, annotations = parse_paragraph(paragraph)
     tagged_sentences = tag_annotations(sentences, annotations)
-    all_tagged_sentences.extend(tagged_sentences)
+    for sentence, tags in tagged_sentences:
+        all_sentences.append(sentence)
+        all_tags.append(tags)
 
-# Output File containing all the tags
-output_file = 'Tagged_File.txt'
-with open(output_file, 'w') as file:
-    for sentence, tags in all_tagged_sentences:
-        for word, tag in zip(sentence, tags):
-            file.write(f'{word}\t{tag}\n')
-        file.write('\n')
+# Define Dataset class
+class NERDataset(Dataset):
+    def __init__(self, sentences, tags, word_encoder, tag_encoder):
+        self.sentences = sentences
+        self.tags = tags
+        self.word_encoder = word_encoder
+        self.tag_encoder = tag_encoder
 
-# Training the Data Set
+    def __len__(self):
+        return len(self.sentences)
 
+    def __getitem__(self, idx):
+        sentence = self.sentences[idx]
+        tags = self.tags[idx]
 
+        sentence_encoded = [self.word_encoder[word] for word in sentence]
+        tags_encoded = self.tag_encoder.transform(tags)
 
+        return torch.tensor(sentence_encoded), torch.tensor(tags_encoded, dtype=torch.long)
 
+# Prepare data
+all_words = [word for sentence in all_sentences for word in sentence]
+all_tags_flat = [tag for tags in all_tags for tag in tags]
 
+word_encoder = {word: idx for idx, word in enumerate(set(all_words))}
+tag_encoder = LabelEncoder()
+tag_encoder.fit(all_tags_flat)
 
-device = torch.device("cuda", torch.cuda.is_available())
+dataset = NERDataset(all_sentences, all_tags, word_encoder, tag_encoder)
+dataloader = DataLoader(dataset, batch_size=8, shuffle=True, collate_fn=lambda x: x)
+
+# Define Model for training
+class NERModel(nn.Module):
+    def __init__(self, vocab_size, tagset_size, embedding_dim=128, hidden_dim=128):
+        super(NERModel, self).__init__()
+        self.embedding = nn.Embedding(vocab_size, embedding_dim)
+        self.lstm = nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
+        self.fc = nn.Linear(hidden_dim, tagset_size)
+
+    def forward(self, x):
+        embeds = self.embedding(x)
+        lstm_out, _ = self.lstm(embeds)
+        tag_space = self.fc(lstm_out)
+        return tag_space
+
+# Training using PyTorch and "CUDA"
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = NERModel(len(word_encoder), len(tag_encoder.classes_)).to(device)
+criterion = nn.CrossEntropyLoss(ignore_index=-100)
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+model.train()
+for epoch in range(20):
+    total_loss = 0
+    for batch in dataloader:
+        sentences, tags = zip(*batch)
+        sentences = torch.nn.utils.rnn.pad_sequence(sentences, batch_first=True).to(device)
+        tags = torch.nn.utils.rnn.pad_sequence(tags, batch_first=True, padding_value=-100).to(device)
+
+        optimizer.zero_grad()
+        outputs = model(sentences)
+        outputs = outputs.view(-1, outputs.shape[-1])
+        tags = tags.view(-1)
+        loss = criterion(outputs, tags)
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.item()
+
+    print(f"Epoch {epoch + 1}, Loss: {total_loss / len(dataloader)}")
+
+# Saving the model
+torch.save(model.state_dict(), 'NER_model.pth')
