@@ -13,9 +13,9 @@ def read_dataset(file_path):
         lines = file.readlines()
     return lines
 
-def remove_punctuations(string_list):
-    translator = str.maketrans('', '', string.punctuation)
-    return [s.translate(translator) for s in string_list]
+# def remove_punctuations(string_list):
+#     translator = str.maketrans('', '', string.punctuation)
+#     return [s.translate(translator) for s in string_list]
 
 def parse_dataset(lines):
     paragraphs = []
@@ -44,9 +44,9 @@ def parse_paragraph(paragraph):
 
     for line in paragraph:
         if re.match(r'^\d+\|\w\|', line):
-            if sentence:
-                sentences.append(sentence)
-                sentence = []
+            # if sentence:
+            #     sentences.append(sentence)
+            #     sentence = []
             text += line.split('|')[2] + ' '
             sentence.extend(line.split('|')[2].split())
             for strings in sentence:
@@ -58,7 +58,7 @@ def parse_paragraph(paragraph):
             annotations.append((start, end, line.split("\t")[3], line.split("\t")[4]))
 
     if split_sentence:
-        sentences.append(sentence)
+        sentences.append(split_sentence)
     return sentences, annotations
 
 def tag_annotations(sentences, annotations):
@@ -66,16 +66,20 @@ def tag_annotations(sentences, annotations):
     char_count = 0
     
     for sentence in sentences:
-        edited_sent = remove_punctuations(sentence)        
-        tags = ['O'] * len(edited_sent)
-        for i, word in enumerate(edited_sent):
-            word_start = char_count
-            word_end = char_count
-            char_count += len(word) + 1
-            
-            for annotation in annotations:
-                start, end, disease_info, label = annotation
-                if word_start >= start and word_end <= end:
+        # edited_sent = remove_punctuations(sentence)
+        tags = ['O'] * len(sentence)
+        word_starts = []
+        char_pos = 0
+        for word in sentence:
+            word_starts.append(char_pos)
+            char_pos += len(word) + 1
+        
+        for start, end, disease_info, label in annotations:
+            for i, word_start in enumerate(word_starts):
+                word_end = word_start + len(sentence[i])
+                if word_start <= start < word_end or word_start < end <= word_end: # The words having punctuation either at start or end
+                    tags[i] = 'I-' + label
+                if start <= word_start < end or start < word_end <= end: # The words without punctuations 
                     tags[i] = 'I-' + label
         
         tagged_sentences.append((sentence, tags))
@@ -89,6 +93,7 @@ all_tagged_sentences = []
 
 for paragraph in paragraphs:
     sentences, annotations = parse_paragraph(paragraph)
+    print (sentences)
     tagged_sentences = tag_annotations(sentences, annotations)
     all_tagged_sentences.extend(tagged_sentences)
 
