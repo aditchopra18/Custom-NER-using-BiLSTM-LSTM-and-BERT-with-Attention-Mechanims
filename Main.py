@@ -2,8 +2,14 @@
 import os
 import re
 import string
+import torch
+from torch.utils.data import Dataset, DataLoader
+from transformers import BertTokenizer, BertForTokenClassification
 
+# Defining the Training and Testing Files
 train_file = 'NCBItrainset_corpus.txt'
+test_file = 'NCBItestset_corpus.txt'
+model = 'bert-base-uncased'
 
 # Reading the dataset file
 def read_dataset(file_path):
@@ -96,3 +102,10 @@ with open(output_file, 'w') as file:
         file.write('\n')
 
 # Training the Data Set
+
+
+
+
+
+
+device = torch.device("cuda", torch.cuda.is_available())
