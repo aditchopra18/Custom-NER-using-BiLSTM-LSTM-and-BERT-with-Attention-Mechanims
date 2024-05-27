@@ -6,7 +6,9 @@ import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 from sklearn.preprocessing import LabelEncoder
 
+# Importing the files
 train_file = 'NCBItrainset_corpus.txt'
+test_file = 'NCBItestset_corpus.txt'
 
 # Reading the dataset file
 def read_dataset(file_path):
@@ -165,3 +167,17 @@ for epoch in range(20):
 
 # Saving the model
 torch.save(model.state_dict(), 'NER_model.pth')
+
+# Testing the model with the Test DataSet, then calculate the error function
+test_lines = read_dataset(test_file)
+test_paragraphs = parse_dataset(test_lines)
+
+test_all_sentences = []
+test_all_tags = []
+
+for test_paragraph in test_paragraphs:
+    test_sentences, test_annotations = parse_paragraph(test_paragraph)
+    test_tagged_sentences = tag_annotations(test_sentences, test_annotations)
+    for test_sentence, test_tags in test_tagged_sentences:
+        test_all_sentences.append(test_sentence)
+        test_all_tags.append(test_tags)
