@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
-import transformers
+from transformers import BertTokenizer
 import string
 
 train_file = 'parsing.txt'
@@ -35,11 +35,10 @@ def parse_dataset(lines):
 
     return paragraphs
 
-def parse_paragraph(paragraph):
+def parse_paragraph(paragraph, tokenizer):
     sentences = []
     annotations = []
     sentence = []
-    text = ""
     split_sentence = []
 
     for line in paragraph:
@@ -47,12 +46,12 @@ def parse_paragraph(paragraph):
             if sentence:
                 sentences.append(sentence)
                 sentence = []
-            text += line.split('|')[2] + ' '
-            sentence.extend(line.split('|')[2].split())
-            for strings in sentence:
-                tokens = re.findall(r'\w+|[^\w\s]', strings, re.UNICODE)
-                split_sentence.extend(tokens)
-
+            text = line.split('|')[2]
+            sentence.extend(text.split())
+            encoded_sentence = tokenizer.encode(text, add_special_tokens=False)
+            tokens = tokenizer.convert_ids_to_tokens(encoded_sentence)
+            split_sentence.extend(tokens)
+            print(tokens)
         elif re.match(r'^\d+\t\d+\t\d+\t', line):
             start, end = int(line.split("\t")[1]), int(line.split("\t")[2])
             annotations.append((start, end, line.split("\t")[3], line.split("\t")[4]))
@@ -67,10 +66,11 @@ def tag_annotations(sentences, annotations):
     
     for sentence in sentences:
         edited_sent = remove_punctuations(sentence)        
+        print(edited_sent)
         tags = ['O'] * len(edited_sent)
         for i, word in enumerate(edited_sent):
             word_start = char_count
-            word_end = char_count
+            word_end = char_count + len(word)
             char_count += len(word) + 1
             
             for annotation in annotations:
@@ -84,11 +84,12 @@ def tag_annotations(sentences, annotations):
 
 lines = read_dataset(train_file)
 paragraphs = parse_dataset(lines)
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 all_tagged_sentences = []
 
 for paragraph in paragraphs:
-    sentences, annotations = parse_paragraph(paragraph)
+    sentences, annotations = parse_paragraph(paragraph, tokenizer)
     tagged_sentences = tag_annotations(sentences, annotations)
     all_tagged_sentences.extend(tagged_sentences)
 

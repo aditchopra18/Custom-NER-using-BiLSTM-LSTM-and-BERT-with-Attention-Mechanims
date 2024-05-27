@@ -63,7 +63,7 @@ lead	O
 to	O
 cancer,	O
 particularly	O
-in	I-DiseaseClass
+in	O
 the	O
 colon.	O
 Most	O
@@ -71,7 +71,7 @@ colon	O
 cancers	O
 arise	O
 from	I-DiseaseClass
-mutations	I-DiseaseClass
+mutations	O
 in	O
 the	O
 gene	O
@@ -82,7 +82,7 @@ coli	I-SpecificDisease
 (APC),	I-SpecificDisease
 a	I-SpecificDisease
 protein	I-SpecificDisease
-required	I-SpecificDisease
+required	O
 for	O
 ubiquitin-mediated	O
 degradation	O
@@ -99,7 +99,7 @@ some	O
 other	O
 cancers	O
 harbour	I-CompositeMention
-beta-catenin-stabilizing	I-CompositeMention
+beta-catenin-stabilizing	O
 mutations.	O
 Recently,	O
 we	O
@@ -119,12 +119,12 @@ skin	O
 tumours	O
 resembling	O
 pilomatricomas.	O
-Given	I-DiseaseClass
+Given	O
 that	O
 the	O
 skin	I-SpecificDisease
 of	I-SpecificDisease
-these	I-SpecificDisease
+these	O
 adult	O
 mice	O
 also	O
@@ -144,7 +144,7 @@ might	O
 originate	O
 from	I-SpecificDisease
 hair	I-SpecificDisease
-matrix	I-SpecificDisease
+matrix	O
 cells	O
 and	O
 whether	O
@@ -173,7 +173,7 @@ nuclear	O
 LEF-1	O
 in	I-DiseaseClass
 the	I-DiseaseClass
-dividing	I-DiseaseClass
+dividing	O
 tumour	O
 cells,	O
 providing	O
@@ -187,7 +187,7 @@ from	O
 hair	O
 matrix	I-SpecificDisease
 cells.	I-SpecificDisease
-At	I-SpecificDisease
+At	O
 least	O
 75%	O
 of	O
@@ -197,7 +197,7 @@ possess	O
 mutations	O
 affecting	O
 the	O
-amino-terminal	I-DiseaseClass
+amino-terminal	O
 segment,	O
 normally	O
 involved	O
@@ -227,7 +227,7 @@ far,	O
 and	O
 directly	O
 implicates	O
-beta-catenin/LEF	I-DiseaseClass
+beta-catenin/LEF	O
 misregulation	O
 as	O
 the	O
@@ -258,9 +258,9 @@ form	O
 of	O
 hemochromatosis.	O
 
-Hereditary	I-SpecificDisease
+Hereditary	O
 hemochromatosis	I-SpecificDisease
-(HH)	I-SpecificDisease
+(HH)	O
 is	I-SpecificDisease
 a	O
 common	O
@@ -269,7 +269,7 @@ recessive	I-DiseaseClass
 genetic	I-DiseaseClass
 disorder	I-DiseaseClass
 of	I-DiseaseClass
-iron	I-DiseaseClass
+iron	O
 metabolism.	O
 The	O
 HFE	O
@@ -285,7 +285,7 @@ involved	O
 in	O
 HH	O
 was	O
-identified	I-SpecificDisease
+identified	O
 in	O
 1996.	O
 Two	O
@@ -324,7 +324,7 @@ non-C282Y	O
 HH	O
 chromosomes.	O
 We	O
-report	I-Modifier
+report	O
 here	O
 on	O
 the	O
@@ -370,7 +370,7 @@ accounting	O
 for	I-SpecificDisease
 85%	I-SpecificDisease
 of	I-SpecificDisease
-carrier	I-SpecificDisease
+carrier	O
 chromosomes,	O
 whereas	O
 the	O
@@ -385,7 +385,7 @@ chromosomes	O
 that	O
 did	O
 not	O
-carry	I-Modifier
+carry	O
 the	O
 C282Y	O
 mutation.	O
@@ -424,7 +424,7 @@ chromosomes	O
 that	O
 were	O
 neither	O
-C282Y	I-Modifier
+C282Y	O
 nor	O
 H63D.	O
 This	O
@@ -437,7 +437,7 @@ chromosomes	O
 suggests	O
 that	O
 the	O
-S65C	I-Modifier
+S65C	O
 substitution	O
 is	O
 associated	O
