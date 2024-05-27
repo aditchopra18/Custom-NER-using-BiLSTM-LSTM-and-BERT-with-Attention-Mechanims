@@ -7,6 +7,7 @@ from torch.utils.data import Dataset, DataLoader
 from sklearn.preprocessing import LabelEncoder
 
 train_file = 'NCBItrainset_corpus.txt'
+test_file = 'NCBItestset_corpus.txt'
 output_file = 'Tagged_Test_File.txt'
 model_name = 'NER_model.pth'
 
@@ -170,7 +171,7 @@ torch.save(model.state_dict(), model_name)
 
 # Save annotation results
 model.eval()
-all_predictions = []
+all_annotations = []
 
 with torch.no_grad():
     for sentence in all_sentences:
@@ -178,10 +179,34 @@ with torch.no_grad():
         outputs = model(sentence_encoded)
         predictions = torch.argmax(outputs, dim=2).squeeze(0).cpu().numpy()
         predicted_tags = tag_encoder.inverse_transform(predictions)
-        all_predictions.append((sentence, predicted_tags))
+        all_annotations.append((sentence, predicted_tags))
 
 with open(output_file, 'w') as file:
-    for sentence, tags in all_predictions:
+    for sentence, tags in all_annotations:
         for word, tag in zip(sentence, tags):
             file.write(f'{word}\t{tag}\n')
         file.write('\n')
+
+# Testing the model on the NCBI Testing Dataset, and calculating the error function. 
+
+# Extracting the Testing Dataset
+test_lines = read_dataset(test_file)
+test_paragraphs = parse_dataset(test_lines)
+
+test_sentences = []
+test_tags = []
+
+for paragraph in test_paragraphs:
+    sentences, annotations = parse_paragraph(paragraph)
+    tagged_sentences = tag_annotations(sentences, annotations)
+    for sentence, tags in tagged_sentences:
+        test_sentences.append(sentence)
+        test_tags.append(tags)
+
+# Encoding the test data
+test_dataset = NERDataset(test_sentences, test_tags, word_encoder, tag_encoder)
+test_dataloader = DataLoader(test_dataset, batch_size=8, shuffle=False, collate_fn=lambda x: x)
+all_true_flags = []
+all_pred_flags = []
+
+model.eval()
