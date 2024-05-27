@@ -942,7 +942,7 @@ hemolytic	O
 activity.	O
 The	O
 absence	I-Modifier
-of	I-Modifier
+of	O
 functional	I-Modifier
 C7	I-Modifier
 activity	O
@@ -1510,7 +1510,7 @@ characterized	O
 by	O
 episodes	O
 of	O
-fever	O
+fever	I-DiseaseClass
 with	O
 serositis	I-DiseaseClass
 or	O
@@ -1727,8 +1727,8 @@ syndrome	I-SpecificDisease
 (ALPS)	I-SpecificDisease
 is	O
 a	O
-disorder	I-CompositeMention
-of	I-CompositeMention
+disorder	I-DiseaseClass
+of	I-DiseaseClass
 lymphocyte	I-CompositeMention
 homeostasis	I-CompositeMention
 and	I-CompositeMention
@@ -1982,7 +1982,7 @@ inherited	I-DiseaseClass
 disease	I-DiseaseClass
 characterized	O
 by	O
-progressive	O
+progressive	I-SpecificDisease
 neurologic	I-SpecificDisease
 dysfunction,	I-SpecificDisease
 occasionally	O
@@ -2120,7 +2120,7 @@ unrelated	O
 Japanese	O
 patients	O
 with	O
-ALD	O
+ALD	I-SpecificDisease
 by	I-SpecificDisease
 genomic	O
 Southern	O
@@ -2190,8 +2190,8 @@ nucleotide	O
 alterations	O
 in	O
 the	O
-ALD	O
-gene.	I-Modifier
+ALD	I-Modifier
+gene.	O
 Eighteen	O
 (69%)	O
 of	O
@@ -2298,7 +2298,7 @@ phenotypes	O
 of	O
 patients	O
 with	O
-ALD	O
+ALD	I-SpecificDisease
 and	I-SpecificDisease
 their	O
 genotypes,	O
@@ -2594,7 +2594,7 @@ might	O
 underlie	O
 the	O
 various	O
-clinical	I-DiseaseClass
+clinical	O
 abnormalities	I-DiseaseClass
 encountered	O
 in	O
@@ -2850,7 +2850,7 @@ differences	O
 between	O
 them.	O
 
-Homozygous	I-SpecificDisease
+Homozygous	O
 hypobetalipoproteinemia:	I-SpecificDisease
 a	O
 disease	O
@@ -3321,7 +3321,7 @@ with	O
 the	O
 presence	O
 of	O
-hereditary	I-SpecificDisease
+hereditary	I-DiseaseClass
 hemochromatosis,	I-SpecificDisease
 such	O
 as	O
@@ -4182,7 +4182,7 @@ C2	O
 gene	O
 deletion,	O
 and	O
-3)	O
+3)	I-SpecificDisease
 type	I-SpecificDisease
 II	I-SpecificDisease
 C2	I-SpecificDisease
@@ -4195,7 +4195,7 @@ different,	O
 as	O
 yet	O
 uncharacterized,	O
-molecular	O
+molecular	I-DiseaseClass
 genetic	I-DiseaseClass
 defect..	I-DiseaseClass
 
@@ -4490,7 +4490,7 @@ fluorescent	O
 chemical	O
 cleavage	O
 of	O
-mismatches.	O
+mismatches.	I-SpecificDisease
 Fabry	I-SpecificDisease
 disease	I-SpecificDisease
 (FD)	I-SpecificDisease
@@ -4982,7 +4982,7 @@ of	O
 BRCA1	O
 mutations	O
 to	O
-breast	I-SpecificDisease
+breast	I-CompositeMention
 cancer	I-SpecificDisease
 in	O
 the	O
@@ -7580,7 +7580,7 @@ brain,	I-SpecificDisease
 is	O
 a	O
 severe	O
-leukodystrophy	I-SpecificDisease
+leukodystrophy	I-DiseaseClass
 caused	O
 by	O
 the	O
@@ -9914,7 +9914,7 @@ presence	O
 of	O
 cardiac	I-DiseaseClass
 abnormalities	I-DiseaseClass
-with	I-DiseaseClass
+with	O
 specific	O
 genetic	I-DiseaseClass
 lesions,	I-DiseaseClass
@@ -9924,7 +9924,7 @@ identified	O
 in	O
 patients	O
 with	O
-cardiomyopathy	I-DiseaseClass
+cardiomyopathy	I-SpecificDisease
 fell	I-DiseaseClass
 in	O
 the	O
@@ -10384,7 +10384,7 @@ the	O
 germ-line	O
 mutations	O
 of	O
-APC	O
+APC	I-Modifier
 1)	O
 the	O
 great	O
@@ -10483,7 +10483,7 @@ in	O
 FAP	I-Modifier
 families..	O
 
-Hereditary	O
+Hereditary	I-SpecificDisease
 deficiency	I-SpecificDisease
 of	I-SpecificDisease
 C5	I-SpecificDisease
@@ -10575,9 +10575,9 @@ episodes	O
 of	O
 fever	I-DiseaseClass
 with	O
-serositis	I-SpecificDisease
+serositis	I-DiseaseClass
 or	O
-synovitis.	I-SpecificDisease
+synovitis.	I-DiseaseClass
 Recently	O
 the	O
 FMF	I-Modifier
@@ -11450,7 +11450,7 @@ is	O
 implicated	O
 in	O
 both	O
-neoplastic	I-Modifier
+neoplastic	I-SpecificDisease
 (Wilms	I-SpecificDisease
 tumor,	I-SpecificDisease
 mesothelioma,	I-SpecificDisease
@@ -11459,7 +11459,7 @@ and	O
 breast	I-SpecificDisease
 cancer)	I-SpecificDisease
 and	O
-nonneoplastic	I-Modifier
+nonneoplastic	I-SpecificDisease
 (glomerulosclerosis)	I-SpecificDisease
 disease.	O
 The	O
@@ -11499,10 +11499,10 @@ characterized	O
 by	O
 a	O
 nephropathy	I-SpecificDisease
-involving	O
+involving	I-SpecificDisease
 mesangial	I-SpecificDisease
 sclerosis,	I-SpecificDisease
-XY	O
+XY	I-SpecificDisease
 pseudohermaphroditism,	I-SpecificDisease
 and/or	O
 Wilms	I-SpecificDisease
@@ -12532,7 +12532,7 @@ demonstrated	O
 in	O
 vitro.	O
 
-Heterozygous	I-SpecificDisease
+Heterozygous	O
 C2	I-SpecificDisease
 deficiency	I-SpecificDisease
 associated	O
@@ -12868,7 +12868,7 @@ that	O
 is	O
 mutated	O
 in	O
-familial	I-CompositeMention
+familial	I-DiseaseClass
 breast	I-CompositeMention
 and	I-CompositeMention
 ovarian	I-CompositeMention
@@ -13079,8 +13079,8 @@ mutated	O
 in	O
 DMD..	I-SpecificDisease
 
-Myotonic	I-Modifier
-dystrophy	I-Modifier
+Myotonic	I-SpecificDisease
+dystrophy	I-SpecificDisease
 kinase	O
 is	O
 a	O
@@ -13428,7 +13428,7 @@ increased	O
 relative	O
 risk	O
 for	O
-breast	I-SpecificDisease
+breast	I-CompositeMention
 cancer	I-SpecificDisease
 was	O
 supported	O
@@ -13461,7 +13461,7 @@ of	O
 Dutch	O
 patients	O
 with	O
-breast	I-SpecificDisease
+breast	I-CompositeMention
 cancer.	I-SpecificDisease
 We	O
 have	O
@@ -13530,7 +13530,7 @@ patients	O
 a	O
 contralateral	O
 breast	O
-tumor	O
+tumor	I-Modifier
 had	O
 been	O
 diagnosed.	O
@@ -13570,8 +13570,8 @@ were	O
 patients	O
 with	O
 bilateral	O
-breast	O
-cancer.	O
+breast	I-CompositeMention
+cancer.	I-CompositeMention
 Our	O
 results	O
 indicate	O
@@ -13597,8 +13597,8 @@ an	O
 increased	O
 risk	O
 of	O
-breast	O
-cancer	O
+breast	I-Modifier
+cancer	I-Modifier
 in	O
 heterozygotes.	O
 We	O
@@ -13617,7 +13617,7 @@ a	O
 type	O
 of	O
 breast	O
-cancer	O
+cancer	I-Modifier
 characterized	O
 by	O
 frequent	O
@@ -13933,7 +13933,7 @@ patients	O
 with	O
 classic	I-SpecificDisease
 galactosemia	I-SpecificDisease
-and	I-SpecificDisease
+and	O
 a	O
 1%	O
 prevalence	O
@@ -14617,7 +14617,7 @@ which	O
 is	O
 associated	O
 with	O
-favism	I-DiseaseClass
+favism	I-SpecificDisease
 among	O
 other	O
 clinical	O
@@ -15107,7 +15107,7 @@ increased	O
 life	O
 span.	O
 
-Hereditary	O
+Hereditary	I-SpecificDisease
 deficiency	I-SpecificDisease
 of	I-SpecificDisease
 the	I-SpecificDisease
@@ -15271,7 +15271,7 @@ meningococcal	I-Modifier
 serogroup.	O
 Identification	O
 of	O
-complement	I-Modifier
+complement	O
 deficient	I-Modifier
 patients	O
 allows	O
@@ -15307,7 +15307,7 @@ over	O
 patients	O
 suffering	O
 from	O
-Duchenne	I-CompositeMention
+Duchenne	I-SpecificDisease
 or	I-CompositeMention
 Becker	I-CompositeMention
 muscular	I-CompositeMention
@@ -15984,7 +15984,7 @@ of	O
 81	O
 patients	O
 with	O
-MLD	I-Modifier
+MLD	I-SpecificDisease
 examined,	O
 further	O
 validates	O
@@ -16634,7 +16634,7 @@ and	I-DiseaseClass
 clinical	O
 manifestations	O
 of	O
-XLRS.	O
+XLRS.	I-SpecificDisease
 However,	I-SpecificDisease
 the	O
 limited	O
@@ -16697,7 +16697,7 @@ deficiency:	I-SpecificDisease
 report	O
 from	O
 the	O
-Maternal	I-Modifier
+Maternal	O
 Phenylketonuria	I-Modifier
 Collaborative	O
 Study.	O
@@ -16860,12 +16860,12 @@ genotype.	O
 The	O
 IQ	O
 of	O
-PAH-deficient	I-Modifier
+PAH-deficient	O
 mothers	I-Modifier
 with	O
 a	O
 severe	O
-PKU	O
+PKU	I-Modifier
 mutation	I-Modifier
 in	O
 combination	O
@@ -16892,8 +16892,8 @@ mothers	I-Modifier
 with	O
 two	O
 severe	O
-PKU	O
-mutations	I-Modifier
+PKU	I-Modifier
+mutations	O
 or	O
 with	O
 one	O
@@ -16992,7 +16992,7 @@ of	O
 the	O
 mother	O
 with	O
-PKU.	O
+PKU.	I-SpecificDisease
 The	I-SpecificDisease
 significant	O
 relationship	O
@@ -17024,7 +17024,7 @@ treatment	O
 of	O
 females	O
 with	O
-PKU	O
+PKU	I-SpecificDisease
 who	I-SpecificDisease
 plan	O
 pregnancy..	O
@@ -17800,7 +17800,7 @@ in	O
 the	O
 mutant..	O
 
-Autosomal	I-SpecificDisease
+Autosomal	O
 recessive	I-SpecificDisease
 familial	I-SpecificDisease
 neurohypophyseal	I-SpecificDisease
@@ -18616,7 +18616,7 @@ exists	O
 in	O
 FAP	I-SpecificDisease
 desmoids.	I-SpecificDisease
-APC	O
+APC	I-Modifier
 is	O
 not,	O
 therefore,	O
@@ -19123,7 +19123,7 @@ the	O
 major	O
 cause	O
 of	O
-hyperphenylalaninemia.	I-DiseaseClass
+hyperphenylalaninemia.	I-SpecificDisease
 We	O
 have	O
 previously	O
@@ -20621,7 +20621,7 @@ demonstrate	O
 linkage	O
 disequilibrium	O
 between	O
-DM	O
+DM	I-SpecificDisease
 and	O
 APOC2	O
 in	O
@@ -20787,7 +20787,7 @@ of	O
 the	O
 mutations.	O
 
-Hereditary	O
+Hereditary	I-SpecificDisease
 TP53	O
 codon	O
 292	O
@@ -20839,7 +20839,7 @@ been	O
 frequently	O
 reported	O
 in	O
-Li-Fraumeni	I-SpecificDisease
+Li-Fraumeni	I-DiseaseClass
 syndrome.	I-SpecificDisease
 On	O
 the	O
@@ -21201,7 +21201,7 @@ We	O
 now	O
 report	O
 the	O
-molecular	I-DiseaseClass
+molecular	O
 lesion	I-DiseaseClass
 associated	O
 with	O
@@ -22217,7 +22217,7 @@ DNA	O
 changes	O
 associated	O
 with	O
-glucose-6-phosphate	I-Modifier
+glucose-6-phosphate	I-SpecificDisease
 dehydrogenase	I-Modifier
 (G6PD)	I-Modifier
 -deficient	I-Modifier
@@ -22823,7 +22823,7 @@ the	O
 genomic	O
 DNA	O
 of	O
-tumour	I-DiseaseClass
+tumour	I-Modifier
 and	O
 normal	O
 fractions	O
@@ -23299,7 +23299,7 @@ the	O
 presence	O
 of	O
 the	O
-human	I-SpecificDisease
+human	O
 immunodeficiency	I-SpecificDisease
 virus	I-SpecificDisease
 (HIV).	I-SpecificDisease
@@ -23643,8 +23643,8 @@ of	O
 these	O
 drugs	O
 
-Combined	I-CompositeMention
-genetic	I-CompositeMention
+Combined	O
+genetic	O
 deficiency	I-CompositeMention
 of	I-CompositeMention
 C6	I-CompositeMention
@@ -24529,7 +24529,7 @@ an	O
 early	O
 event	O
 in	O
-colorectal	O
+colorectal	I-SpecificDisease
 tumourigenesis.	O
 Both	O
 types	O
@@ -29691,8 +29691,8 @@ lipoproteins	O
 containing	O
 ApoA-II	O
 in	O
-classic	O
-lecithin:	O
+classic	I-SpecificDisease
+lecithin:	I-SpecificDisease
 cholesterol	I-SpecificDisease
 acyltransferase	I-SpecificDisease
 deficiency	I-SpecificDisease
@@ -30020,7 +30020,7 @@ carriers	O
 to	O
 multiple	O
 adenomatous	I-CompositeMention
-polyps	I-CompositeMention
+polyps	I-SpecificDisease
 of	I-CompositeMention
 the	I-CompositeMention
 colon	I-CompositeMention
@@ -31519,7 +31519,7 @@ FAP	I-Modifier
 patients	O
 with	O
 profuse	O
-polyps	I-DiseaseClass
+polyps	I-SpecificDisease
 were	O
 observed	O
 between	O
@@ -31597,12 +31597,12 @@ electroretinogram	O
 of	O
 patients	O
 with	O
-Duchenne	I-CompositeMention
+Duchenne	I-SpecificDisease
 and	I-CompositeMention
 Becker	I-CompositeMention
 muscular	I-CompositeMention
 dystrophy	I-CompositeMention
-(DMD/BMD)	I-SpecificDisease
+(DMD/BMD)	I-CompositeMention
 shows	O
 a	O
 marked	O
@@ -32365,7 +32365,7 @@ PWS	I-Modifier
 patients	O
 and	O
 the	O
-ND	O
+ND	I-Modifier
 controls,	O
 suggesting	O
 that	O
@@ -34093,7 +34093,7 @@ Translocation	O
 t(5;11)(q13.1;p13)	O
 associated	O
 with	O
-familial	O
+familial	I-SpecificDisease
 isolated	I-SpecificDisease
 aniridia.	I-SpecificDisease
 A	O
@@ -34333,7 +34333,7 @@ between	O
 the	O
 tumor	I-Modifier
 suppressor	O
-APC	O
+APC	I-Modifier
 and	O
 G-protein	O
 signaling.	O
@@ -34460,7 +34460,7 @@ the	O
 gene	O
 mutated	O
 in	O
-Duchenne	I-CompositeMention
+Duchenne	I-SpecificDisease
 and	I-CompositeMention
 the	I-CompositeMention
 milder	I-CompositeMention
@@ -35086,7 +35086,7 @@ accompanied	O
 by	O
 central	I-SpecificDisease
 scotoma	I-SpecificDisease
-and	I-SpecificDisease
+and	O
 well-demarcated	O
 atrophy	I-SpecificDisease
 of	I-SpecificDisease
@@ -37426,7 +37426,7 @@ wasting,	I-SpecificDisease
 myotonia,	I-DiseaseClass
 cardiac	I-DiseaseClass
 arrhythmia,	I-DiseaseClass
-hyperinsulinaemia,	I-SpecificDisease
+hyperinsulinaemia,	I-DiseaseClass
 mental	I-DiseaseClass
 retardation	I-DiseaseClass
 and	O
@@ -37561,7 +37561,7 @@ decreased	O
 development	O
 of	O
 skeletal	O
-muscle	O
+muscle	I-DiseaseClass
 force	O
 and	O
 cardiac	I-DiseaseClass
@@ -39617,12 +39617,12 @@ II	I-DiseaseClass
 collagenopathy,	I-DiseaseClass
 characterized	O
 by	O
-short	O
+short	I-DiseaseClass
 trunk	O
 and	O
 limbs,	O
 kyphoscoliosis,	I-DiseaseClass
-midface	I-SpecificDisease
+midface	I-DiseaseClass
 hypoplasia,	I-SpecificDisease
 severe	O
 myopia,	I-DiseaseClass
@@ -40019,7 +40019,7 @@ the	O
 APC	I-Modifier
 gene	O
 in	O
-colorectal	I-DiseaseClass
+colorectal	I-SpecificDisease
 tumors:	I-DiseaseClass
 mutation	O
 cluster	O
@@ -40794,7 +40794,7 @@ of	O
 PWS,	I-SpecificDisease
 and	O
 advanced	O
-maternal	O
+maternal	I-SpecificDisease
 age	O
 may	O
 be	O
@@ -40804,7 +40804,7 @@ factor..	O
 
 Genetic	O
 defect	I-SpecificDisease
-in	I-SpecificDisease
+in	O
 secretion	I-SpecificDisease
 of	I-SpecificDisease
 complement	I-SpecificDisease
@@ -41641,7 +41641,7 @@ nervous	I-CompositeMention
 system	I-CompositeMention
 defects	I-CompositeMention
 and	O
-no	I-DiseaseClass
+no	O
 eyes.	I-DiseaseClass
 The	O
 pattern	O
@@ -42745,7 +42745,7 @@ may	O
 be	O
 involved	O
 in	O
-hepatoblastoma	I-Modifier
+hepatoblastoma	I-SpecificDisease
 tumorigenesis.	O
 A	O
 major	O
@@ -44285,8 +44285,8 @@ in	O
 this	O
 patient.	O
 
-Glucose-6-phosphate	O
-dehydrogenase	O
+Glucose-6-phosphate	I-SpecificDisease
+dehydrogenase	I-SpecificDisease
 variants	O
 and	O
 their	O
@@ -45128,7 +45128,7 @@ five	O
 unrelated	O
 subjects	O
 with	O
-hereditary	O
+hereditary	I-SpecificDisease
 protein	I-SpecificDisease
 S	I-SpecificDisease
 deficiency	I-SpecificDisease
@@ -45768,7 +45768,7 @@ the	O
 hprt	O
 locus	O
 in	O
-Lesch-Nyhan	I-Modifier
+Lesch-Nyhan	I-SpecificDisease
 patients.	O
 Hypoxanthine-guanine	O
 phosphoribosyltransferase	O
@@ -45810,7 +45810,7 @@ in	O
 Lesch-Nyhan	I-SpecificDisease
 syndrome	I-SpecificDisease
 (L-N).	I-SpecificDisease
-L-N	I-Modifier
+L-N	I-SpecificDisease
 patients	O
 fail	O
 to	O
@@ -46801,7 +46801,7 @@ evidence	O
 of	O
 neurologic	I-DiseaseClass
 disease	I-DiseaseClass
-(leukodystrophy	I-SpecificDisease
+(leukodystrophy	I-DiseaseClass
 or	O
 myeloneuropathy)	I-SpecificDisease
 was	O
@@ -47894,7 +47894,7 @@ He	O
 has	O
 an	O
 associated	O
-odontoma	I-SpecificDisease
+odontoma	I-DiseaseClass
 and	O
 pigmented	I-DiseaseClass
 ocular	I-DiseaseClass
@@ -49271,7 +49271,7 @@ females	O
 demonstrated	O
 neurological	I-DiseaseClass
 abnormalities	I-DiseaseClass
-and	O
+and	I-DiseaseClass
 growth	I-DiseaseClass
 retardation	I-DiseaseClass
 characteristic	O
@@ -49509,7 +49509,7 @@ demyelination	I-DiseaseClass
 in	I-DiseaseClass
 the	I-DiseaseClass
 central	I-DiseaseClass
-and	I-DiseaseClass
+and	O
 peripheral	I-DiseaseClass
 nervous	I-DiseaseClass
 system.	I-DiseaseClass
@@ -49554,7 +49554,7 @@ and	O
 blood.	O
 The	O
 ALD	I-Modifier
-gene	I-Modifier
+gene	O
 has	O
 been	O
 recently	O
@@ -51154,9 +51154,9 @@ the	O
 Golgi	O
 apparatus.	O
 
-Glucose	I-SpecificDisease
-6-phosphate	I-SpecificDisease
-dehydrogenase	I-SpecificDisease
+Glucose	O
+6-phosphate	O
+dehydrogenase	O
 deficiency	I-SpecificDisease
 and	O
 incidence	O
@@ -52451,7 +52451,7 @@ the	O
 tumor	I-Modifier
 suppressor	O
 gene,	O
-APC,	I-Modifier
+APC,	O
 causes	O
 adenomatous	I-SpecificDisease
 polyposis	I-SpecificDisease
@@ -52890,7 +52890,7 @@ persons	O
 dying	O
 from	O
 a	O
-cancer	I-DiseaseClass
+cancer	I-Modifier
 before	O
 age	O
 45.	O
@@ -52992,7 +52992,7 @@ specific	O
 mutations.	O
 A	O
 new	O
-molecular	I-DiseaseClass
+molecular	O
 lesion	I-DiseaseClass
 has	O
 been	O
@@ -53413,7 +53413,7 @@ close	O
 linkage	O
 between	O
 the	O
-WAS	I-SpecificDisease
+WAS	I-Modifier
 and	O
 OATL1	O
 loci	O
@@ -54109,7 +54109,7 @@ BFIC	I-Modifier
 phenotype.	O
 
 Brain	I-DiseaseClass
-disease	I-DiseaseClass
+disease	I-SpecificDisease
 and	O
 molecular	O
 analysis	O
@@ -54300,7 +54300,7 @@ for	O
 BRCA1	O
 mutations.	O
 The	O
-hereditary	I-CompositeMention
+hereditary	I-DiseaseClass
 breast	I-CompositeMention
 and	I-CompositeMention
 ovarian	I-CompositeMention
@@ -56254,7 +56254,7 @@ analysis	O
 of	O
 NKH.	I-SpecificDisease
 
-Growth	I-DiseaseClass
+Growth	O
 retardation	I-DiseaseClass
 and	O
 tumour	I-Modifier
@@ -57600,7 +57600,7 @@ of	O
 eight	O
 siblings	O
 have	O
-fructosuria,	I-DiseaseClass
+fructosuria,	I-SpecificDisease
 all	O
 affected	O
 individuals	O
@@ -59608,7 +59608,7 @@ the	O
 same	O
 risk	O
 of	O
-cancer	I-DiseaseClass
+cancer	I-SpecificDisease
 as	O
 in	O
 individuals	O
@@ -59705,7 +59705,7 @@ high	O
 risk	O
 of	O
 developing	O
-breast	I-CompositeMention
+breast	I-SpecificDisease
 and/or	I-CompositeMention
 ovarian	I-CompositeMention
 cancer.	I-CompositeMention
@@ -59859,7 +59859,7 @@ increase	O
 our	O
 understanding	O
 of	O
-hypobetalipoproteinemia,	I-SpecificDisease
+hypobetalipoproteinemia,	I-DiseaseClass
 atherogenesis,	I-DiseaseClass
 and	O
 the	O
@@ -59959,7 +59959,7 @@ Ashkenazi	O
 Jewish	O
 prostate	I-Modifier
 cancer	I-Modifier
-patients,	I-Modifier
+patients,	O
 most	O
 of	O
 whom	O
@@ -60081,7 +60081,7 @@ breast	I-CompositeMention
 and	I-CompositeMention
 ovarian	I-CompositeMention
 cancers,	I-CompositeMention
-mutations	I-CompositeMention
+mutations	O
 in	O
 BRCA1	O
 or	O
@@ -61476,7 +61476,7 @@ levels	O
 of	O
 arginine	O
 vasopressin	O
-(AVP)	O
+(AVP)	I-DiseaseClass
 and	O
 diabetes	I-DiseaseClass
 insipidus	I-DiseaseClass
@@ -61933,7 +61933,7 @@ McGraw-Hill,	O
 1998].	O
 The	O
 VHL	O
-gene	I-Modifier
+gene	O
 was	O
 localized	O
 to	O
@@ -61955,8 +61955,8 @@ Germline	O
 mutations	O
 in	O
 the	O
-VHL	O
-gene	I-Modifier
+VHL	I-Modifier
+gene	O
 have	O
 been	O
 detected	O
@@ -61965,14 +61965,14 @@ the	O
 majority	O
 of	O
 VHL	O
-kindreds.	I-Modifier
+kindreds.	O
 The	O
 reported	O
 frequency	O
 of	O
 detection	O
 of	O
-VHL	O
+VHL	I-Modifier
 germline	I-Modifier
 mutations	O
 has	O
@@ -62098,7 +62098,7 @@ point	O
 mutations	O
 in	O
 the	O
-VHL	O
+VHL	I-Modifier
 locus.	O
 We	I-Modifier
 found	O
@@ -62121,7 +62121,7 @@ probes	O
 that	O
 cover	O
 the	O
-VHL	O
+VHL	I-Modifier
 locus.	O
 We	I-Modifier
 then	O
@@ -62135,7 +62135,7 @@ four	O
 of	O
 these	O
 VHL	O
-families	I-Modifier
+families	O
 two	O
 were	O
 found	O
@@ -62155,9 +62155,9 @@ germline	O
 mosaicism	O
 of	O
 the	O
-VHL	O
+VHL	I-Modifier
 gene	O
-was	I-Modifier
+was	O
 identified	I-Modifier
 in	O
 one	O
@@ -62940,7 +62940,7 @@ any	O
 coding	O
 sequence	O
 of	O
-APC	O
+APC	I-Modifier
 at	O
 the	O
 genomic	O
@@ -63485,7 +63485,7 @@ the	O
 MJD1	O
 gene.	O
 
-Familial	O
+Familial	I-SpecificDisease
 Prader-Willi	I-SpecificDisease
 syndrome	I-SpecificDisease
 with	O
@@ -64850,7 +64850,7 @@ VHL	I-Modifier
 gene.	O
 A	O
 somatic	O
-VHL	I-Modifier
+VHL	O
 gene	O
 mutation	O
 was	O
@@ -64914,7 +64914,7 @@ a	O
 tumor	I-Modifier
 suppressor	O
 gene,	O
-VHL	I-Modifier
+VHL	O
 gene	O
 mutations	O
 may	O
@@ -64956,7 +64956,7 @@ a	O
 dominant	O
 predisposition	O
 to	O
-cancer	I-CompositeMention
+cancer	I-DiseaseClass
 of	I-CompositeMention
 the	I-CompositeMention
 breast	I-CompositeMention
@@ -65373,7 +65373,7 @@ risk	O
 of	O
 transmitting	O
 a	O
-cleft	O
+cleft	I-Modifier
 is	O
 26.	O
 45%;	O
@@ -67359,7 +67359,7 @@ patients	O
 with	O
 a	O
 similar	O
-PWS-like	I-Modifier
+PWS-like	I-SpecificDisease
 phenotype	O
 even	O
 without	O
@@ -67770,7 +67770,7 @@ panel	O
 of	O
 patients	O
 with	O
-Duchenne	I-CompositeMention
+Duchenne	I-SpecificDisease
 and	I-CompositeMention
 Becker	I-CompositeMention
 muscular	I-CompositeMention
@@ -68284,8 +68284,8 @@ in	O
 Polish	O
 families	O
 with	O
-breast-ovarian	I-CompositeMention
-cancer.	I-CompositeMention
+breast-ovarian	I-SpecificDisease
+cancer.	I-SpecificDisease
 We	O
 have	O
 undertaken	O
@@ -69031,7 +69031,7 @@ could	O
 underlie	O
 both	O
 ALD	I-SpecificDisease
-and	O
+and	I-SpecificDisease
 abnormal	I-SpecificDisease
 color	I-SpecificDisease
 vision	I-SpecificDisease
@@ -69106,7 +69106,7 @@ of	O
 the	O
 frequency	O
 of	O
-phenotypic	I-SpecificDisease
+phenotypic	O
 color	I-SpecificDisease
 vision	I-SpecificDisease
 defects.	I-SpecificDisease
@@ -69628,7 +69628,7 @@ C	O
 gene	O
 mutations..	O
 
-X	O
+X	I-SpecificDisease
 inactivation	O
 and	O
 somatic	O
@@ -71551,7 +71551,7 @@ gene	O
 in	O
 patients	O
 with	O
-hereditary	O
+hereditary	I-SpecificDisease
 aniridia.	I-SpecificDisease
 The	O
 14	O
@@ -71706,7 +71706,7 @@ the	O
 gene	O
 responsible	O
 for	O
-hereditary	O
+hereditary	I-SpecificDisease
 aniridia..	I-SpecificDisease
 
 Locus	O
@@ -72137,7 +72137,7 @@ and	O
 glaucoma..	I-SpecificDisease
 
 The	O
-dermatofibrosarcoma	I-Modifier
+dermatofibrosarcoma	O
 protuberans-associated	I-Modifier
 collagen	O
 type	O
@@ -74456,7 +74456,7 @@ a	O
 risk	O
 factor	O
 for	O
-VHL	I-Modifier
+VHL	O
 patients	O
 to	O
 develop	O
@@ -75414,7 +75414,7 @@ support	O
 the	O
 model	O
 for	O
-HH	O
+HH	I-Modifier
 in	O
 which	O
 HFE	O
@@ -76108,7 +76108,7 @@ mutations	O
 found	O
 in	O
 the	O
-isolated	I-Modifier
+isolated	O
 thrombocytopenia	I-Modifier
 patients	O
 leave	O
@@ -76127,7 +76127,7 @@ in	O
 both	O
 severe	O
 and	O
-attenuated	O
+attenuated	I-Modifier
 WAS	I-SpecificDisease
 patients	O
 result	O
@@ -78025,7 +78025,7 @@ with	O
 cleft	I-CompositeMention
 lip/palate	I-CompositeMention
 and	I-CompositeMention
-lip	I-SpecificDisease
+lip	I-CompositeMention
 pits,	I-SpecificDisease
 affected	O
 relatives	O
@@ -78049,7 +78049,7 @@ further	O
 localize	O
 the	O
 VWS	I-Modifier
-gene	I-Modifier
+gene	O
 we	O
 searched	O
 for	O
@@ -79121,7 +79121,7 @@ the	O
 structural	O
 gene	O
 for	O
-C3	O
+C3	I-SpecificDisease
 and	O
 is	O
 not	O
@@ -81599,7 +81599,7 @@ evidence	O
 that	O
 mutations	O
 in	O
-PDS	O
+PDS	I-Modifier
 cause	O
 both	O
 syndromic	I-CompositeMention
@@ -82150,7 +82150,7 @@ in	O
 ten	O
 families	O
 with	O
-cancer	I-DiseaseClass
+cancer	I-SpecificDisease
 linked	O
 to	O
 chromosome	O
@@ -82254,7 +82254,7 @@ Genetic	O
 instability	O
 in	O
 human	O
-ovarian	I-Modifier
+ovarian	I-SpecificDisease
 cancer	I-Modifier
 cell	O
 lines.	O
@@ -82466,7 +82466,7 @@ instability	O
 observed	O
 in	O
 the	O
-tumor	I-DiseaseClass
+tumor	I-Modifier
 and	O
 cell	O
 line	O
@@ -83449,7 +83449,7 @@ to	O
 be	O
 normal..	O
 
-Hypoxanthine-guanine	I-SpecificDisease
+Hypoxanthine-guanine	I-Modifier
 phosphoribosyltransferase	I-SpecificDisease
 deficiency:	I-SpecificDisease
 analysis	O
@@ -83823,7 +83823,7 @@ the	O
 first	O
 inherited	I-DiseaseClass
 disorder	I-DiseaseClass
-in	I-DiseaseClass
+in	O
 man	O
 associated	O
 with	O
@@ -85111,7 +85111,7 @@ revealed	O
 deletions	O
 involving	O
 the	O
-VHL	I-Modifier
+VHL	O
 gene	O
 in	O
 each	O
@@ -85146,7 +85146,7 @@ deletion	O
 of	O
 the	O
 entire	O
-VHL	I-Modifier
+VHL	O
 gene.	O
 Our	O
 results	O
@@ -86389,7 +86389,7 @@ or	O
 part	O
 of	O
 the	O
-NDP	O
+NDP	I-Modifier
 lies	O
 in	O
 the	O
@@ -86974,7 +86974,7 @@ a	O
 male	O
 patient	O
 with	O
-BFLS-like	I-Modifier
+BFLS-like	I-SpecificDisease
 features	O
 and	O
 a	O
@@ -87125,7 +87125,7 @@ a	O
 candidate	O
 gene	O
 for	O
-familial	O
+familial	I-SpecificDisease
 cases	O
 of	O
 the	O
@@ -87990,7 +87990,7 @@ deletion	O
 mouse	O
 model	O
 of	O
-Prader-Willi	I-CompositeMention
+Prader-Willi	I-SpecificDisease
 and	I-CompositeMention
 angelman	I-CompositeMention
 syndromes.	I-CompositeMention
@@ -89891,7 +89891,7 @@ most	O
 common	O
 of	O
 the	O
-inherited	I-SpecificDisease
+inherited	I-DiseaseClass
 ataxias.	I-SpecificDisease
 The	O
 recent	O
@@ -91845,7 +91845,7 @@ the	O
 genotype-phenotype	O
 correlation	O
 in	O
-FAP	I-Modifier
+FAP	I-SpecificDisease
 patients	O
 and	O
 support	O
@@ -92298,7 +92298,7 @@ classical	O
 picture	O
 of	O
 severe	O
-childhood	O
+childhood	I-SpecificDisease
 ALD	I-SpecificDisease
 we	O
 identified	O
@@ -92641,9 +92641,9 @@ the	O
 DTDST	O
 protein..	O
 
-Emerin,	I-SpecificDisease
+Emerin,	I-Modifier
 deficiency	I-SpecificDisease
-of	O
+of	I-SpecificDisease
 which	O
 causes	O
 Emery-Dreifuss	I-SpecificDisease
@@ -92876,7 +92876,7 @@ in	O
 Zellweger	I-SpecificDisease
 syndrome.	I-SpecificDisease
 The	O
-Zellweger	I-DiseaseClass
+Zellweger	I-SpecificDisease
 spectrum	I-DiseaseClass
 of	I-DiseaseClass
 disease,	I-DiseaseClass
@@ -93008,7 +93008,7 @@ basis	O
 of	O
 disease	O
 in	O
-Zellweger	I-Modifier
+Zellweger	I-SpecificDisease
 syndrome	I-Modifier
 patients	O
 from	O
@@ -94521,8 +94521,8 @@ of	O
 A-T..	I-SpecificDisease
 
 Duchenne	I-Modifier
-muscular	I-Modifier
-dystrophy	I-Modifier
+muscular	I-SpecificDisease
+dystrophy	I-SpecificDisease
 gene	O
 expression	O
 in	O
@@ -94678,7 +94678,7 @@ region.	O
 The	O
 genes	O
 for	O
-Becker	I-CompositeMention
+Becker	I-SpecificDisease
 and	I-CompositeMention
 Duchenne	I-CompositeMention
 dystrophies	I-CompositeMention
@@ -95819,7 +95819,7 @@ gene	O
 in	O
 normal	O
 and	O
-GRMD	I-Modifier
+GRMD	O
 dogs	O
 has	O
 failed	O
@@ -96032,8 +96032,8 @@ their	O
 healthy	O
 parents.	O
 
-Glucose-6-phosphate	O
-dehydrogenase	O
+Glucose-6-phosphate	I-SpecificDisease
+dehydrogenase	I-SpecificDisease
 variants	O
 from	O
 Italian	O
@@ -96544,7 +96544,7 @@ mutations	O
 are	O
 responsible	O
 for	O
-G6PD	O
+G6PD	I-SpecificDisease
 polymorphism	O
 in	O
 Sardinia.	O
@@ -97843,7 +97843,7 @@ centromere	O
 as	O
 pter--GTD--AHC--GK--DMD--OTC--cen	O
 
-Duchenne	I-SpecificDisease
+Duchenne	I-Modifier
 muscular	I-SpecificDisease
 dystrophy	I-SpecificDisease
 and	O
@@ -98003,7 +98003,7 @@ histopathological	O
 levels..	O
 
 Autosomal	O
-recessive	O
+recessive	I-SpecificDisease
 transmission	O
 of	O
 hemophilia	I-SpecificDisease
@@ -98259,7 +98259,7 @@ transmission.	O
 Determination	O
 of	O
 30	O
-X-linked	I-Modifier
+X-linked	I-SpecificDisease
 adrenoleukodystrophy	I-Modifier
 mutations,	O
 including	O
@@ -98882,7 +98882,7 @@ of	O
 Tay-Sachs	I-SpecificDisease
 disease.	I-SpecificDisease
 
-Adrenoleukodystrophy	I-Modifier
+Adrenoleukodystrophy	I-SpecificDisease
 gene	O
 encodes	O
 an	O
@@ -99958,12 +99958,12 @@ of	O
 25	O
 of	O
 progressive	I-CompositeMention
-gait	I-CompositeMention
+gait	I-DiseaseClass
 and	I-CompositeMention
 limb	I-CompositeMention
 ataxia,	I-CompositeMention
 absence	I-DiseaseClass
-of	I-DiseaseClass
+of	I-CompositeMention
 deep	I-DiseaseClass
 tendon	I-DiseaseClass
 reflexes,	I-DiseaseClass
@@ -100534,7 +100534,7 @@ in	O
 origin	O
 in	O
 the	O
-Prader-Willi	I-SpecificDisease
+Prader-Willi	I-Modifier
 syndrome.	I-SpecificDisease
 Interstitial	O
 cytogenetic	O
@@ -100991,7 +100991,7 @@ hereditary	I-SpecificDisease
 ovarian	I-SpecificDisease
 cancers	I-SpecificDisease
 in	I-SpecificDisease
-this	I-SpecificDisease
+this	O
 population	O
 have	O
 surgical	O
@@ -101146,7 +101146,7 @@ DNA	O
 from	O
 patients	O
 with	O
-Becker	I-CompositeMention
+Becker	I-SpecificDisease
 and	I-CompositeMention
 Duchenne	I-CompositeMention
 muscular	I-CompositeMention
@@ -101258,7 +101258,7 @@ inheritance	O
 of	O
 the	O
 DMD	I-Modifier
-X	O
+X	I-Modifier
 chromosome,	O
 the	O
 subclones	O
@@ -102889,10 +102889,10 @@ and	I-SpecificDisease
 extremities,	I-SpecificDisease
 mid-face	I-DiseaseClass
 hypoplasia,	I-DiseaseClass
-cleft	I-SpecificDisease
-palate,	I-SpecificDisease
+cleft	I-DiseaseClass
+palate,	I-DiseaseClass
 myopia,	I-DiseaseClass
-retinal	I-SpecificDisease
+retinal	I-DiseaseClass
 detachment,	I-SpecificDisease
 and	O
 hearing	I-DiseaseClass
@@ -103244,7 +103244,7 @@ the	O
 disease	O
 trait.	O
 
-Hypopigmentation	I-DiseaseClass
+Hypopigmentation	I-SpecificDisease
 in	O
 the	O
 Prader-Willi	I-SpecificDisease
@@ -103703,12 +103703,12 @@ in	O
 tribal	O
 populations	O
 in	O
-India.	O
+India.	I-SpecificDisease
 Deficiency	I-SpecificDisease
 of	I-SpecificDisease
 glucose-6-phosphate	I-SpecificDisease
 dehydrogenase	I-SpecificDisease
-(G6PD)	O
+(G6PD)	I-SpecificDisease
 is	O
 usually	O
 found	O
@@ -103909,7 +103909,7 @@ is	O
 a	O
 rare	O
 human	O
-condition	O
+condition	I-DiseaseClass
 in	O
 which	O
 severe	O
@@ -107276,7 +107276,7 @@ was	O
 used	O
 to	O
 assess	O
-OCRL	I-Modifier
+OCRL	O
 carrier	O
 status	O
 in	O
@@ -107504,7 +107504,7 @@ necessary	O
 to	O
 produce	O
 the	O
-G6PD	I-Modifier
+G6PD	O
 deficient	I-Modifier
 phenotype.	O
 The	O
@@ -107760,7 +107760,7 @@ responsible	O
 for	O
 enzyme	I-SpecificDisease
 deficiency	I-SpecificDisease
-in	I-SpecificDisease
+in	O
 G6PD	I-SpecificDisease
 A-	O
 because	O
@@ -107835,7 +107835,7 @@ deletions	O
 in	O
 patients	O
 with	O
-Duchenne	I-CompositeMention
+Duchenne	I-SpecificDisease
 or	I-CompositeMention
 Becker	I-CompositeMention
 muscular	I-CompositeMention
@@ -108286,7 +108286,7 @@ Chromosome	O
 breakage	O
 in	O
 the	O
-Prader-Willi	I-CompositeMention
+Prader-Willi	I-SpecificDisease
 and	I-CompositeMention
 Angelman	I-CompositeMention
 syndromes	I-CompositeMention
@@ -110227,7 +110227,7 @@ the	O
 PAX6	O
 gene	O
 in	O
-eye	I-DiseaseClass
+eye	I-SpecificDisease
 anomalies.	I-DiseaseClass
 The	O
 PAX6	O
@@ -110839,7 +110839,7 @@ activity	O
 exceeding	O
 that	O
 of	O
-adult	I-Modifier
+adult	O
 MLD	I-Modifier
 patients.	O
 Analysis	O
@@ -111513,7 +111513,7 @@ Eight	O
 patients	O
 with	O
 adult-onset	O
-ALD	O
+ALD	I-SpecificDisease
 underwent	I-SpecificDisease
 clinical	O
 examination,	O
@@ -111721,7 +111721,7 @@ recessive	I-DiseaseClass
 disorder	I-DiseaseClass
 characterized	O
 by	O
-ichthyosis,	I-DiseaseClass
+ichthyosis,	I-SpecificDisease
 mental	I-DiseaseClass
 retardation,	I-DiseaseClass
 spasticity,	I-DiseaseClass
@@ -113111,7 +113111,7 @@ in	O
 the	O
 pathogenesis	O
 of	O
-sporadic	O
+sporadic	I-DiseaseClass
 colorectal	I-DiseaseClass
 and	I-DiseaseClass
 other	I-DiseaseClass
@@ -113140,7 +113140,7 @@ as	O
 a	O
 cause	O
 of	O
-inherited	O
+inherited	I-SpecificDisease
 susceptibility	O
 to	O
 both	O
@@ -113631,7 +113631,7 @@ basis	O
 of	O
 the	O
 protein-import	I-DiseaseClass
-deficiency	I-DiseaseClass
+deficiency	I-SpecificDisease
 in	O
 human	O
 peroxisomal	I-DiseaseClass

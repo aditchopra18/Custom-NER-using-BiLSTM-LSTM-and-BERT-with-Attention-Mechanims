@@ -6,9 +6,9 @@ import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 from sklearn.preprocessing import LabelEncoder
 
-# Importing the files
 train_file = 'NCBItrainset_corpus.txt'
-test_file = 'NCBItestset_corpus.txt'
+output_file = 'Tagged_Test_File.txt'
+model_name = 'NER_model.pth'
 
 # Reading the dataset file
 def read_dataset(file_path):
@@ -166,18 +166,22 @@ for epoch in range(20):
     print(f"Epoch {epoch + 1}, Loss: {total_loss / len(dataloader)}")
 
 # Saving the model
-torch.save(model.state_dict(), 'NER_model.pth')
+torch.save(model.state_dict(), model_name)
 
-# Testing the model with the Test DataSet, then calculate the error function
-test_lines = read_dataset(test_file)
-test_paragraphs = parse_dataset(test_lines)
+# Save annotation results
+model.eval()
+all_predictions = []
 
-test_all_sentences = []
-test_all_tags = []
+with torch.no_grad():
+    for sentence in all_sentences:
+        sentence_encoded = torch.tensor([word_encoder[word] for word in sentence], dtype=torch.long).unsqueeze(0).to(device)
+        outputs = model(sentence_encoded)
+        predictions = torch.argmax(outputs, dim=2).squeeze(0).cpu().numpy()
+        predicted_tags = tag_encoder.inverse_transform(predictions)
+        all_predictions.append((sentence, predicted_tags))
 
-for test_paragraph in test_paragraphs:
-    test_sentences, test_annotations = parse_paragraph(test_paragraph)
-    test_tagged_sentences = tag_annotations(test_sentences, test_annotations)
-    for test_sentence, test_tags in test_tagged_sentences:
-        test_all_sentences.append(test_sentence)
-        test_all_tags.append(test_tags)
+with open(output_file, 'w') as file:
+    for sentence, tags in all_predictions:
+        for word, tag in zip(sentence, tags):
+            file.write(f'{word}\t{tag}\n')
+        file.write('\n')
