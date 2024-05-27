@@ -31,11 +31,9 @@ def parse_paragraph(paragraph):
     sentences = []
     annotations = []
     sentence = []
-    text = ""
 
     for line in paragraph:
         if re.match(r'^\d+\|\w\|', line):
-            text += line.split('|')[2] + ' '
             sentence.extend(line.split('|')[2].split())
 
         elif re.match(r'^\d+\t\d+\t\d+\t', line):
@@ -44,9 +42,9 @@ def parse_paragraph(paragraph):
 
     if sentence:
         sentences.append(sentence)
-    return sentences, annotations, text.strip()
+    return sentences, annotations
 
-def tag_annotations(sentences, annotations, text):
+def tag_annotations(sentences, annotations):
     tagged_sentences = []
     char_count = 0
 
@@ -60,7 +58,7 @@ def tag_annotations(sentences, annotations, text):
             word_starts.append(char_pos)
             char_pos += len(word)
             word_ends.append(char_pos)
-            char_pos += 1  # Account for the space
+            char_pos += 1  # WhiteSpace Character
 
         for start, end, disease_info, label in annotations:
             for i, (word_start, word_end) in enumerate(zip(word_starts, word_ends)):
@@ -79,8 +77,8 @@ paragraphs = parse_dataset(lines)
 all_tagged_sentences = []
 
 for paragraph in paragraphs:
-    sentences, annotations, text = parse_paragraph(paragraph)
-    tagged_sentences = tag_annotations(sentences, annotations, text)
+    sentences, annotations= parse_paragraph(paragraph)
+    tagged_sentences = tag_annotations(sentences, annotations)
     all_tagged_sentences.extend(tagged_sentences)
 
 output_file = 'Tagged_File.txt'
