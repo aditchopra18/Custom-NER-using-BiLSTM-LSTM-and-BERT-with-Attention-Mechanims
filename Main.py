@@ -13,9 +13,9 @@ def read_dataset(file_path):
         lines = file.readlines()
     return lines
 
-def remove_punctuations(strings):
+def remove_punctuations(string_list):
     translator = str.maketrans('', '', string.punctuation)
-    return [s.translate(translator) for s in strings]
+    return [s.translate(translator) for s in string_list]
 
 def parse_dataset(lines):
     paragraphs = []
@@ -40,7 +40,8 @@ def parse_paragraph(paragraph):
     annotations = []
     sentence = []
     text = ""
-    
+    split_sentence = []
+
     for line in paragraph:
         if re.match(r'^\d+\|\w\|', line):
             if sentence:
@@ -48,12 +49,15 @@ def parse_paragraph(paragraph):
                 sentence = []
             text += line.split('|')[2] + ' '
             sentence.extend(line.split('|')[2].split())
+            for strings in sentence:
+                tokens = re.findall(r'\w+|[^\w\s]', strings, re.UNICODE)
+                split_sentence.extend(tokens)
+
         elif re.match(r'^\d+\t\d+\t\d+\t', line):
             start, end = int(line.split("\t")[1]), int(line.split("\t")[2])
-            text_segment = text[start:end]
             annotations.append((start, end, line.split("\t")[3], line.split("\t")[4]))
 
-    if sentence:
+    if split_sentence:
         sentences.append(sentence)
     return sentences, annotations
 
@@ -66,9 +70,9 @@ def tag_annotations(sentences, annotations):
         tags = ['O'] * len(edited_sent)
         for i, word in enumerate(edited_sent):
             word_start = char_count
+            word_end = char_count
             char_count += len(word) + 1
-            word_end = char_count - 1
-
+            
             for annotation in annotations:
                 start, end, disease_info, label = annotation
                 if word_start >= start and word_end <= end:
