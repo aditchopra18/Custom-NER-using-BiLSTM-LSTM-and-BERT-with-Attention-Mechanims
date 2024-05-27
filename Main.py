@@ -1,21 +1,13 @@
 import os
 import re
-import numpy as np
-import pandas as pd
-import torch
-from torch.utils.data import Dataset, DataLoader
-import transformers
 import string
 
 train_file = 'parsing.txt'
+
 def read_dataset(file_path):
     with open(file_path, "r") as file:
         lines = file.readlines()
     return lines
-
-# def remove_punctuations(string_list):
-#     translator = str.maketrans('', '', string.punctuation)
-#     return [s.translate(translator) for s in string_list]
 
 def parse_dataset(lines):
     paragraphs = []
@@ -40,50 +32,45 @@ def parse_paragraph(paragraph):
     annotations = []
     sentence = []
     text = ""
-    split_sentence = []
 
     for line in paragraph:
         if re.match(r'^\d+\|\w\|', line):
-            # if sentence:
-            #     sentences.append(sentence)
-            #     sentence = []
             text += line.split('|')[2] + ' '
             sentence.extend(line.split('|')[2].split())
-            for strings in sentence:
-                tokens = re.findall(r'\w+|[^\w\s]', strings, re.UNICODE)
-                split_sentence.extend(tokens)
 
         elif re.match(r'^\d+\t\d+\t\d+\t', line):
             start, end = int(line.split("\t")[1]), int(line.split("\t")[2])
             annotations.append((start, end, line.split("\t")[3], line.split("\t")[4]))
 
-    if split_sentence:
-        sentences.append(split_sentence)
-    return sentences, annotations
+    if sentence:
+        sentences.append(sentence)
+    return sentences, annotations, text.strip()
 
-def tag_annotations(sentences, annotations):
+def tag_annotations(sentences, annotations, text):
     tagged_sentences = []
     char_count = 0
-    
+
     for sentence in sentences:
-        # edited_sent = remove_punctuations(sentence)
         tags = ['O'] * len(sentence)
         word_starts = []
+        word_ends = []
         char_pos = 0
+
         for word in sentence:
             word_starts.append(char_pos)
-            char_pos += len(word) + 1
-        
+            char_pos += len(word)
+            word_ends.append(char_pos)
+            char_pos += 1  # Account for the space
+
         for start, end, disease_info, label in annotations:
-            for i, word_start in enumerate(word_starts):
-                word_end = word_start + len(sentence[i])
-                if word_start <= start < word_end or word_start < end <= word_end: # The words having punctuation either at start or end
+            for i, (word_start, word_end) in enumerate(zip(word_starts, word_ends)):
+                if word_start >= start and word_end <= end:
                     tags[i] = 'I-' + label
-                if start <= word_start < end or start < word_end <= end: # The words without punctuations 
+                elif word_start < start < word_end or word_start < end < word_end:
                     tags[i] = 'I-' + label
-        
+
         tagged_sentences.append((sentence, tags))
-        
+
     return tagged_sentences
 
 lines = read_dataset(train_file)
@@ -92,9 +79,8 @@ paragraphs = parse_dataset(lines)
 all_tagged_sentences = []
 
 for paragraph in paragraphs:
-    sentences, annotations = parse_paragraph(paragraph)
-    print (sentences)
-    tagged_sentences = tag_annotations(sentences, annotations)
+    sentences, annotations, text = parse_paragraph(paragraph)
+    tagged_sentences = tag_annotations(sentences, annotations, text)
     all_tagged_sentences.extend(tagged_sentences)
 
 output_file = 'Tagged_File.txt'
