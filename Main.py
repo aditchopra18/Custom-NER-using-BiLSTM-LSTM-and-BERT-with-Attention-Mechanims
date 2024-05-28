@@ -5,7 +5,9 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 from sklearn.preprocessing import LabelEncoder
+from sklearn import metrics
 
+# Importing the relevant files
 train_file = 'NCBItrainset_corpus.txt'
 test_file = 'NCBItestset_corpus.txt'
 output_file = 'Tagged_Test_File.txt'
@@ -145,7 +147,7 @@ class NERModel(nn.Module):
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = NERModel(len(word_encoder), len(tag_encoder.classes_)).to(device)
 criterion = nn.CrossEntropyLoss(ignore_index=-100)
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+optimizer = optim.AdamW(model.parameters(), lr=0.001)
 
 model.train()
 for epoch in range(20):
@@ -206,7 +208,11 @@ for paragraph in test_paragraphs:
 # Encoding the test data
 test_dataset = NERDataset(test_sentences, test_tags, word_encoder, tag_encoder)
 test_dataloader = DataLoader(test_dataset, batch_size=8, shuffle=False, collate_fn=lambda x: x)
-all_true_flags = []
-all_pred_flags = []
 
+# Setting the model in evaluation mode
 model.eval()
+# with torch.no_grad():
+
+result_file = "Test_Report_File.txt"
+# with open (result_file, "w") as res_file:
+#   
