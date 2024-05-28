@@ -1,7 +1,10 @@
 # Importing the training model
 import Training_Model as tr_mod
-import torch
+import torch.utils.data
 from sklearn.metrics import classification_report
+import pandas as pd
+import numpy as np
+
 # Load the test dataset
 test_file = 'NCBItestset_corpus.txt'
 test_lines = tr_mod.read_dataset(test_file)
@@ -17,14 +20,17 @@ for paragraph in test_paragraphs:
         test_sentences.append(sentence)
         test_tags.append(tags)
 
+# Load the model
 model_name = 'NER_model.pth'
 model = tr_mod.NERModel(len(tr_mod.word_encoder), len(tr_mod.tag_encoder.classes_)).to(tr_mod.device)
 model.load_state_dict(torch.load(model_name))
 model.eval()
 
-test_dataset = tr_mod.NERDataset(test_sentences, test_tags, tr_mod.word_encoder, tr_mod.tag_encoder)
-test_dataloader = tr_mod.DataLoader(test_dataset, batch_size=8, shuffle=False, collate_fn=lambda x: x)
+# Prepare the test data
+test_dataset = tr_mod.NERDataset(test_sentences, test_tags, tr_mod.word_encoder, tr_mod.tag_encoder, '<UNK>')
+test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=8, shuffle=False, collate_fn=lambda x: x)
 
+# Evaluate the model and save results
 result_file = 'Test_Results.txt'
 all_true_labels = []
 all_pred_labels = []
@@ -55,5 +61,6 @@ with open(result_file, 'w') as file:
                 all_true_labels.append(true_label)
                 all_pred_labels.append(pred_label)
 
+# Print and save classification report
 report = classification_report(all_true_labels, all_pred_labels)
 print(report)

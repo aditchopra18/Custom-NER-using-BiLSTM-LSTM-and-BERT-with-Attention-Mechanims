@@ -5,12 +5,9 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 from sklearn.preprocessing import LabelEncoder
-from sklearn import metrics
 
 # Importing the relevant files
 train_file = 'NCBItrainset_corpus.txt'
-test_file = 'NCBItestset_corpus.txt'
-output_file = 'Tagged_Test_File.txt'
 model_name = 'NER_model.pth'
 
 # Reading the dataset file
@@ -60,7 +57,7 @@ def tag_annotations(sentences, annotations):
     char_count = 0
 
     for sentence in sentences:
-        tags = ['O'] * len(sentence) # Initially all tags are set at "O"
+        tags = ['O'] * len(sentence)  # Initially all tags are set at "O"
         word_starts = []
         word_ends = []
         char_pos = 0
@@ -100,11 +97,12 @@ for paragraph in paragraphs:
 
 # Define Dataset class
 class NERDataset(Dataset):
-    def __init__(self, sentences, tags, word_encoder, tag_encoder):
+    def __init__(self, sentences, tags, word_encoder, tag_encoder, unknown_token='<UNK>'):
         self.sentences = sentences
         self.tags = tags
         self.word_encoder = word_encoder
         self.tag_encoder = tag_encoder
+        self.unknown_token = unknown_token
 
     def __len__(self):
         return len(self.sentences)
@@ -113,7 +111,7 @@ class NERDataset(Dataset):
         sentence = self.sentences[idx]
         tags = self.tags[idx]
 
-        sentence_encoded = [self.word_encoder[word] for word in sentence]
+        sentence_encoded = [self.word_encoder.get(word, self.word_encoder[self.unknown_token]) for word in sentence]
         tags_encoded = self.tag_encoder.transform(tags)
 
         return torch.tensor(sentence_encoded), torch.tensor(tags_encoded, dtype=torch.long)
@@ -123,10 +121,13 @@ all_words = [word for sentence in all_sentences for word in sentence]
 all_tags_flat = [tag for tags in all_tags for tag in tags]
 
 word_encoder = {word: idx for idx, word in enumerate(set(all_words))}
+unknown_token = '<UNK>'
+word_encoder[unknown_token] = len(word_encoder)  # Add unknown token
+
 tag_encoder = LabelEncoder()
 tag_encoder.fit(all_tags_flat)
 
-dataset = NERDataset(all_sentences, all_tags, word_encoder, tag_encoder)
+dataset = NERDataset(all_sentences, all_tags, word_encoder, tag_encoder, unknown_token)
 dataloader = DataLoader(dataset, batch_size=8, shuffle=True, collate_fn=lambda x: x)
 
 # Define Model for training
@@ -170,21 +171,3 @@ for epoch in range(20):
 
 # Saving the model
 torch.save(model.state_dict(), model_name)
-
-# Save annotation results
-model.eval()
-all_annotations = []
-
-with torch.no_grad():
-    for sentence in all_sentences:
-        sentence_encoded = torch.tensor([word_encoder[word] for word in sentence], dtype=torch.long).unsqueeze(0).to(device)
-        outputs = model(sentence_encoded)
-        predictions = torch.argmax(outputs, dim=2).squeeze(0).cpu().numpy()
-        predicted_tags = tag_encoder.inverse_transform(predictions)
-        all_annotations.append((sentence, predicted_tags))
-
-with open(output_file, 'w') as file:
-    for sentence, tags in all_annotations:
-        for word, tag in zip(sentence, tags):
-            file.write(f'{word}\t{tag}\n')
-        file.write('\n')
