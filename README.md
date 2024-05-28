@@ -15,12 +15,13 @@ sources like clinical records, scientific literature, and so on. </p>
 
 ### Dataset Used
 <p>The NCBI disease corpus is utilized for training and testing the NER model. This corpus contains annotated sentences with disease names, which serve as a research resource for the biomedical natural language processing community</p>
-<p>The Dataset files used are:</p>
+<p>The Dataset files used are named as:</p>
 <ul>
   <li><b> Training Dataset: </b> <i>NCBItrainset_corpus.txt</i></li>
   <li><b> Testing Dataset: </b> <i>NCBItestset_corpus.txt</i></li>
 </ul>
-
+<p>These dataset files are accessible to all via the <a href = "https://www.ncbi.nlm.nih.gov/CBBresearch/Dogan/DISEASE/">NCBI Disease Portal</a>.
+  
 ### Objective
 <p> The main objective of this project is to create a custom NER model, which is powerful and robust enough to handle vast amounts of annotated biomedical texts. Thus, along with PyTorch and Cuda, a BiLSTM 
   architecture is used for increasing accuracy. </p>
