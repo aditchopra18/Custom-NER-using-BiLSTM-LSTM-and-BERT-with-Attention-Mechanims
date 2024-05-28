@@ -9,7 +9,6 @@ from sklearn import metrics
 
 # Importing the relevant files
 train_file = 'NCBItrainset_corpus.txt'
-test_file = 'NCBItestset_corpus.txt'
 output_file = 'Tagged_Test_File.txt'
 model_name = 'NER_model.pth'
 
@@ -188,31 +187,3 @@ with open(output_file, 'w') as file:
         for word, tag in zip(sentence, tags):
             file.write(f'{word}\t{tag}\n')
         file.write('\n')
-
-# Testing the model on the NCBI Testing Dataset, and calculating the error function. 
-
-# Extracting the Testing Dataset
-test_lines = read_dataset(test_file)
-test_paragraphs = parse_dataset(test_lines)
-
-test_sentences = []
-test_tags = []
-
-for paragraph in test_paragraphs:
-    sentences, annotations = parse_paragraph(paragraph)
-    tagged_sentences = tag_annotations(sentences, annotations)
-    for sentence, tags in tagged_sentences:
-        test_sentences.append(sentence)
-        test_tags.append(tags)
-
-# Encoding the test data
-test_dataset = NERDataset(test_sentences, test_tags, word_encoder, tag_encoder)
-test_dataloader = DataLoader(test_dataset, batch_size=8, shuffle=False, collate_fn=lambda x: x)
-
-# Setting the model in evaluation mode
-model.eval()
-# with torch.no_grad():
-
-result_file = "Test_Report_File.txt"
-# with open (result_file, "w") as res_file:
-#   
