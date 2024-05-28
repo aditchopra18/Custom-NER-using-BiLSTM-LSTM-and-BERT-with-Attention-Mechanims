@@ -48,4 +48,13 @@ sources like clinical records, scientific literature, and so on. </p>
   <ul>
     <li><b>Training Procedure:</b><p>The model is trained using the AdamW optimizer, and uses the CrossEntropy loss function, and is run only for a few epochs. The model is then saved as "NER_Model.pth" in the main file directory.</p></li>
   </ul>
+
+  <h3><li>Evaluating Model</li></h3>
+  <ul>
+    <li><b>Model Testing:</b><p>The model is then tested using the testing dataset. The results are then generated using the "Classification_Report" from the "sklearn" library and printed in the terminal window.</p></li>
+  </ul>  
 </ol>
+
+## Conclusion
+<p>This project uses PyTorch and LSTM-based RNN for developing a NER model, specifically trained on biomedical data from the NCBI Disease Corpus datasets. The implementation of an LSTM-based architecture along with 
+  the preprocessing steps account for a model which achieves accurate identification and classification of disease names, contributing to the advancement of biomedical NLP applications.</p>
