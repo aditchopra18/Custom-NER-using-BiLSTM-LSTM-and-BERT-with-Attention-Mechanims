@@ -9,6 +9,7 @@ from sklearn import metrics
 
 # Importing the relevant files
 train_file = 'NCBItrainset_corpus.txt'
+test_file = 'NCBItestset_corpus.txt'
 output_file = 'Tagged_Test_File.txt'
 model_name = 'NER_model.pth'
 
