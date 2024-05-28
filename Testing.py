@@ -20,7 +20,7 @@ for paragraph in test_paragraphs:
         test_sentences.append(sentence)
         test_tags.append(tags)
 
-# Load the model
+# Loading the model
 model_name = 'NER_model.pth'
 model = tr_mod.NERModel(len(tr_mod.word_encoder), len(tr_mod.tag_encoder.classes_)).to(tr_mod.device)
 model.load_state_dict(torch.load(model_name))
@@ -61,6 +61,6 @@ with open(result_file, 'w') as file:
                 all_true_labels.append(true_label)
                 all_pred_labels.append(pred_label)
 
-# Print and save classification report
+# Printing classification report
 report = classification_report(all_true_labels, all_pred_labels)
 print(report)
