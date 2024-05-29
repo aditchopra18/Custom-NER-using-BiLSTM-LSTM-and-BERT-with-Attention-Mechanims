@@ -96,4 +96,17 @@ for paragraph in paragraphs:
         all_sentences.append(sentence)
         all_tags.append(tags)
 
-# Now using the BERT tokenizer for the 
+# Now using the BERT tokenizer
+tokenizer = BertTokenizer.from_pretrained(model)
+
+def tokenized_sentences_and_labels(sentences, text_labels):
+    labels = []
+    tokenized_sentence = []
+
+    for word, label in zip(sentences, text_labels):
+        tokenized_word = tokenizer.tokenize(word)
+        tokenized_sentence.extend(tokenized_word)
+        labels.extend([label] * len(tokenized_word))
+
+    return tokenized_sentence, labels
+
