@@ -2,11 +2,9 @@
 import Training_Model as tr_mod
 import torch.utils.data
 from sklearn.metrics import classification_report
-import pandas as pd
-import numpy as np
 
 # Load the test dataset
-test_file = 'NCBItestset_corpus.txt'
+test_file = 'Data/NCBItestset_corpus.txt'
 test_lines = tr_mod.read_dataset(test_file)
 test_paragraphs = tr_mod.parse_dataset(test_lines)
 
