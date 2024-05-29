@@ -4,14 +4,13 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
-from transformers import BertTokenizer, BertForTokenClassification, AdamW
+from transformers import BertModel, BertTokenizerFast, BertForTokenClassification, AdamW
 from sklearn.metrics import classification_report
 from torch.nn.utils.rnn import pad_sequence
 
 # Importing the relevant files
 train_file = "Data/NCBItrainset_corpus.txt"
-model = "bert-base-cased"
-model_name = "Bert_NERModel.pth"
+model_name = "bert-base-cased"
 
 # Reading the dataset file
 def read_dataset(file_path):
@@ -98,56 +97,98 @@ for paragraph in paragraphs:
         all_tags.append(tags)
 
 # Now using the BERT tokenizer
-tokenizer = BertTokenizer.from_pretrained(model)
+tokenizer = BertTokenizerFast.from_pretrained(model_name)
 
-def tokenized_sentences_and_labels(sentences, text_labels):
-    labels = []
-    tokenized_sentence = []
-
-    for word, label in zip(sentences, text_labels):
-        tokenized_word = tokenizer.tokenize(word)
-        tokenized_sentence.extend(tokenized_word)
-        labels.extend([label] * len(tokenized_word))
-
-    return tokenized_sentence, labels
-
-# Converting the text in dataset to encoded IDs
-tokenized_text_label = [tokenized_sentences_and_labels(sent, labs) for sent, labs in zip(all_sentences, all_tags)]
-
-tokenized_texts = [token_label_pair[0] for token_label_pair in tokenized_text_label]
-
-labels = [token_label_pair[1] for token_label_pair in tokenized_text_label]
-
-input_ids = [tokenizer.convert_tokens_to_ids(txt) for txt in tokenized_texts]
-
+# Custom Dataset Class
 class NERDataset(Dataset):
-    def __init__(self, input_ids, attention_masks, labels):
-        self.input_ids = input_ids
-        self.attention_masks = attention_masks
-        self.labels = labels
+    def get_tag2id(self):
+        unique_tags = set(tag for tag_seq in self.tags for tag in tag_seq)
+        tag2id = {tag: idx for idx, tag in enumerate(unique_tags)}
+        return tag2id
+        
+    def __init__(self, sentences, tags, tokenizer, max_len):
+        self.sentences = sentences
+        self.tags = tags
+        self.tokenizer = tokenizer
+        self.max_len = max_len
+        self.tag2id = self.get_tag2id()
 
     def __len__(self):
-        return len(self.input_ids)
+        return len(self.sentences)
 
     def __getitem__(self, idx):
-        return {
-            'input_ids': self.input_ids[idx],
-            'attention_mask': self.attention_masks[idx],
-            'labels': self.labels[idx]
-        }
+        sentence = self.sentences[idx]
+        tags = self.tags[idx]
+        
+        encoding = self.tokenizer(sentence, is_split_into_words=True,
+                                  truncation=True,
+                                  padding='max_length',
+                                  max_length=self.max_len,
+                                  return_tensors='pt')
+        
+        labels = [self.tag2id[tag] for tag in tags]
+        labels = labels + [self.tag2id['O']] * (self.max_len - len(labels))
+        
+        item = {key: val.squeeze() for key, val in encoding.items()}
+        item['labels'] = torch.tensor(labels, dtype=torch.long)
+        
+        return item
 
+# Custom Collate Function
+def collate_fn(batch):
+    input_ids = [item['input_ids'] for item in batch]
+    attention_mask = [item['attention_mask'] for item in batch]
+    labels = [item['labels'] for item in batch]
+
+    input_ids = pad_sequence(input_ids, batch_first=True, padding_value=tokenizer.pad_token_id)
+    attention_mask = pad_sequence(attention_mask, batch_first=True, padding_value=0)
+    labels = pad_sequence(labels, batch_first=True, padding_value=-100)  # Ignore index for padding
+
+    max_len = input_ids.size(1)
+    if labels.size(1) != max_len:
+        padded_labels = torch.full((labels.size(0), max_len), -100, dtype=torch.long)
+        padded_labels[:, :labels.size(1)] = labels
+        labels = padded_labels
+
+    return {
+        'input_ids': input_ids,
+        'attention_mask': attention_mask,
+        'labels': labels
+    }
+
+# Parameters
 MAX_LEN = 128
+BATCH_SIZE = 16
 
-input_ids = pad_sequence([torch.tensor(ids) for ids in input_ids], batch_first=True, padding_value=0)
-tags = pad_sequence([torch.tensor([tag2idx.get(l) for l in lab]) for lab in labels], batch_first=True, padding_value=-100)
-attention_masks = (input_ids != 0).float()
+dataset = NERDataset(all_sentences, all_tags, tokenizer, MAX_LEN)
+dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
 
-dataset = NERDataset(input_ids, attention_masks, labels)
-dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
-
-# Defining the model parameters
-model = BertForTokenClassification.from_pretrained('bert-base-cased', num_labels=len(tag2idx))
+# Model
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model.to(device)
-criterion = nn.CrossEntropyLoss(ignore_index=tag2idx['O'])
-optimizer = AdamW(model.parameters(), lr=3e-5)
+model = BertForTokenClassification.from_pretrained(model_name, num_labels=len(dataset.tag2id))
+
+# Optimizer
+optimizer = AdamW(model.parameters(), lr=5e-5)
+
+EPOCHS = 20
+for epoch in range(EPOCHS):
+    model.train()
+    total_loss = 0
+    for batch in dataloader:
+        input_ids = batch['input_ids'].to(device)
+        attention_mask = batch['attention_mask'].to(device)
+        labels = batch['labels'].to(device)
+
+        print(f"input_ids shape: {input_ids.shape}")
+        print(f"labels shape: {labels.shape}")
+
+        outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+        loss = outputs.loss
+        total_loss += loss.item()
+
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+
+    avg_loss = total_loss / len(dataloader)
+    print(f"Epoch {epoch+1}/{EPOCHS}, Loss: {avg_loss}")
