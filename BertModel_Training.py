@@ -8,7 +8,7 @@ from transformers import BertTokenizer
 from sklearn.metrics import classification_report
 
 # Importing the relevant files
-train_file = "NCBItrainset_corpus.txt"
+train_file = "Data/NCBItrainset_corpus.txt"
 model = "bert-base-cased"
 model_name = "Bert_NERModel.pth"
 
@@ -110,3 +110,10 @@ def tokenized_sentences_and_labels(sentences, text_labels):
 
     return tokenized_sentence, labels
 
+# Converting the text in dataset to encoded IDs
+tokenized_text_label = [tokenized_sentences_and_labels(sent, labs) for sent, labs in zip(all_sentences, all_tags)]
+
+tokenized_texts = [token_label_pair[0] for token_label_pair in tokenized_text_label]
+labels = [token_label_pair[1] for token_label_pair in tokenized_text_label]
+
+input_ids = [tokenizer.convert_tokens_to_ids(txt) for txt in tokenized_texts]
