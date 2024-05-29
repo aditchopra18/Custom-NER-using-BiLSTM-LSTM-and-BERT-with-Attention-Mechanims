@@ -4,8 +4,9 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
-from transformers import BertTokenizer
+from transformers import BertTokenizer, BertForTokenClassification, AdamW
 from sklearn.metrics import classification_report
+from torch.nn.utils.rnn import pad_sequence
 
 # Importing the relevant files
 train_file = "Data/NCBItrainset_corpus.txt"
@@ -114,6 +115,39 @@ def tokenized_sentences_and_labels(sentences, text_labels):
 tokenized_text_label = [tokenized_sentences_and_labels(sent, labs) for sent, labs in zip(all_sentences, all_tags)]
 
 tokenized_texts = [token_label_pair[0] for token_label_pair in tokenized_text_label]
+
 labels = [token_label_pair[1] for token_label_pair in tokenized_text_label]
 
 input_ids = [tokenizer.convert_tokens_to_ids(txt) for txt in tokenized_texts]
+
+class NERDataset(Dataset):
+    def __init__(self, input_ids, attention_masks, labels):
+        self.input_ids = input_ids
+        self.attention_masks = attention_masks
+        self.labels = labels
+
+    def __len__(self):
+        return len(self.input_ids)
+
+    def __getitem__(self, idx):
+        return {
+            'input_ids': self.input_ids[idx],
+            'attention_mask': self.attention_masks[idx],
+            'labels': self.labels[idx]
+        }
+
+MAX_LEN = 128
+
+input_ids = pad_sequence([torch.tensor(ids) for ids in input_ids], batch_first=True, padding_value=0)
+tags = pad_sequence([torch.tensor([tag2idx.get(l) for l in lab]) for lab in labels], batch_first=True, padding_value=-100)
+attention_masks = (input_ids != 0).float()
+
+dataset = NERDataset(input_ids, attention_masks, labels)
+dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
+
+# Defining the model parameters
+model = BertForTokenClassification.from_pretrained('bert-base-cased', num_labels=len(tag2idx))
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
+criterion = nn.CrossEntropyLoss(ignore_index=tag2idx['O'])
+optimizer = AdamW(model.parameters(), lr=3e-5)
