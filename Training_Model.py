@@ -57,7 +57,7 @@ def tag_annotations(sentences, annotations):
     char_count = 0
 
     for sentence in sentences:
-        tags = ['O'] * len(sentence)  # Initially all tags are set at "O"
+        tags = ['O'] * len(sentence)  # Set tags at "O"
         word_starts = []
         word_ends = []
         char_pos = 0
@@ -70,6 +70,7 @@ def tag_annotations(sentences, annotations):
 
         # Based on the character limits, change the annotations
         # A custom IO tagging scheme is used
+        # Labels are assigned on the basis of disease label in annotations
         for start, end, disease_info, label in annotations:
             for i, (word_start, word_end) in enumerate(zip(word_starts, word_ends)):
                 if word_start >= start and word_end <= end:
@@ -121,8 +122,9 @@ all_words = [word for sentence in all_sentences for word in sentence]
 all_tags_flat = [tag for tags in all_tags for tag in tags]
 
 word_encoder = {word: idx for idx, word in enumerate(set(all_words))}
-unknown_token = '<UNK>'
+unknown_token = '<UNK>' 
 word_encoder[unknown_token] = len(word_encoder)  # Add unknown token
+# Done to prevent KeyError as some words might be out of vocabulary in testing dataset
 
 tag_encoder = LabelEncoder()
 tag_encoder.fit(all_tags_flat)
@@ -144,12 +146,13 @@ class NERModel(nn.Module):
         tag_space = self.fc(lstm_out)
         return tag_space
 
-# Training using PyTorch and "CUDA"
+# Defining the model characteristics
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = NERModel(len(word_encoder), len(tag_encoder.classes_)).to(device)
 criterion = nn.CrossEntropyLoss(ignore_index=-100)
 optimizer = optim.AdamW(model.parameters(), lr=0.001)
 
+# Training using PyTorch and "CUDA"
 model.train()
 for epoch in range(20):
     total_loss = 0
@@ -169,5 +172,5 @@ for epoch in range(20):
 
     print(f"Epoch {epoch + 1}, Loss: {total_loss / len(dataloader)}")
 
-# Saving the model
+# Saving the model as a .pth file
 torch.save(model.state_dict(), model_name)
