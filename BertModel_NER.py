@@ -1,15 +1,9 @@
-# Import the Relevant Libraries
 import re
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
-from transformers import BertTokenizerFast, BertForTokenClassification, AdamW
-
-# Importing the relevant files
-train_file = 'Data/NCBItrainset_corpus.txt'
-model_name = 'BERT_NER_model.pth'
-ann_file = "Bert_annotation_file.txt"
+from transformers import BertTokenizerFast, BertForTokenClassification
 
 # Reading the dataset file
 def read_dataset(file_path):
@@ -52,7 +46,6 @@ def parse_paragraph(paragraph):
         sentences.append(sentence)
     return sentences, annotations
 
-# Data Labelling
 def tag_annotations(sentences, annotations):
     tagged_sentences = []
 
@@ -68,9 +61,6 @@ def tag_annotations(sentences, annotations):
             word_ends.append(char_pos)
             char_pos += 1  # WhiteSpace Character
 
-        # Based on the character limits, change the annotations
-        # A custom IO tagging scheme is used
-        # Labels are assigned on the basis of disease label in annotations
         for start, end, disease_info, label in annotations:
             for i, (word_start, word_end) in enumerate(zip(word_starts, word_ends)):
                 if word_start >= start and word_end <= end:
@@ -82,7 +72,8 @@ def tag_annotations(sentences, annotations):
 
     return tagged_sentences
 
-# Parsing the dataset file
+# Reading and parsing the dataset
+train_file = 'Data/NCBItrainset_corpus.txt'
 lines = read_dataset(train_file)
 paragraphs = parse_dataset(lines)
 
@@ -96,7 +87,69 @@ for paragraph in paragraphs:
         all_sentences.append(sentence)
         all_tags.append(tags)
 
-with open (ann_file, "w") as a_file:
-    for sen, label in zip (all_sentences, all_tags):
-        for word, lab in zip (sen, label):
-            a_file.write(f'{word}\t{lab}\n')
+class NERDataset(Dataset):
+    def __init__(self, sentences, tags, tokenizer, max_len):
+        self.sentences = sentences
+        self.tags = tags
+        self.tokenizer = tokenizer
+        self.max_len = max_len
+
+    def __len__(self):
+        return len(self.sentences)
+
+    def __getitem__(self, item):
+        sentence = self.sentences[item]
+        tags = self.tags[item]
+
+        encoding = self.tokenizer(sentence, is_split_into_words=True, return_offsets_mapping=True, padding='max_length', truncation=True, max_length=self.max_len)
+        word_ids = encoding.word_ids()
+
+        labels = ['O'] * self.max_len
+        for idx, word_id in enumerate(word_ids):
+            if word_id is None:
+                continue
+            if word_id < len(tags):
+                labels[idx] = tags[word_id]
+
+        labels = [tag2id[label] for label in labels]
+
+        return {
+            'input_ids': torch.tensor(encoding['input_ids'], dtype=torch.long),
+            'attention_mask': torch.tensor(encoding['attention_mask'], dtype=torch.long),
+            'labels': torch.tensor(labels, dtype=torch.long)
+        }
+
+# # Initialize tokenizer and other components
+# tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
+# max_len = 128
+# batch_size = 16
+
+tag2id = {tag: idx for idx, tag in enumerate(set(tag for tags in all_tags for tag in tags))}
+id2tag = {idx: tag for tag, idx in tag2id.items()}
+
+# train_dataset = NERDataset(all_sentences, all_tags, tokenizer, max_len)
+# train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+
+model = BertForTokenClassification.from_pretrained('bert-base-uncased', num_labels=len(tag2id))
+
+optimizer = optim.AdamW(model.parameters(), lr=3e-5)
+
+# epochs = 3
+# for epoch in range(epochs):
+#     model.train()
+#     for batch in train_dataloader:
+#         optimizer.zero_grad()
+#         input_ids = batch['input_ids']
+#         attention_mask = batch['attention_mask']
+#         labels = batch['labels']
+        
+#         outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+#         loss = outputs.loss
+#         loss.backward()
+#         optimizer.step()
+
+#     print(f"Epoch {epoch + 1}, Loss: {loss.item()}")
+
+# # Save the model
+# model_name = 'BERT_NER_model.pth'
+# torch.save(model.state_dict(), model_name)
