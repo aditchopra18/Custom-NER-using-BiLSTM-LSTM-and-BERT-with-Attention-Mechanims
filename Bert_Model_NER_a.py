@@ -4,12 +4,12 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
-from transformers import BertTokenizerFast, BertForTokenClassification, AdamW
+from transformers import BertTokenizerFast, BertForTokenClassification
 from sklearn.preprocessing import LabelEncoder
 
 # Importing the relevant files
 train_file = 'Data/NCBItrainset_corpus.txt'
-model_name = 'NER_model.pth'
+model_name = 'BERT_NER_model.pth'
 
 # Reading the dataset file
 def read_dataset(file_path):
@@ -58,7 +58,7 @@ def tag_annotations(sentences, annotations):
     char_count = 0
 
     for sentence in sentences:
-        tags = ['O'] * len(sentence)  # Set tags at "O"
+        tags = ['O'] * len(sentence)    # Initialize all tags at "O"
         word_starts = []
         word_ends = []
         char_pos = 0
@@ -67,11 +67,14 @@ def tag_annotations(sentences, annotations):
             word_starts.append(char_pos)
             char_pos += len(word)
             word_ends.append(char_pos)
-            char_pos += 1  # WhiteSpace Character
+            char_pos += 1               # WhiteSpace Character
 
-        # Based on the character limits, change the annotations
-        # A custom IO tagging scheme is used
-        # Labels are assigned on the basis of disease label in annotations
+        '''
+        Based on the character limits, the annotations are assigned
+        A custom IO tagging scheme is used
+        Labels are assigned on the basis of disease label in annotations
+        '''
+
         for start, end, disease_info, label in annotations:
             for i, (word_start, word_end) in enumerate(zip(word_starts, word_ends)):
                 if word_start >= start and word_end <= end:
@@ -134,7 +137,7 @@ tag_encoder = LabelEncoder()
 tag_encoder.fit(all_tags_flat)
 
 dataset = NERDataset(all_sentences, all_tags, tokenizer, tag_encoder)
-dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
+dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
 
 # Define BERT-based NER Model
 class BertNERModel(nn.Module):
@@ -148,14 +151,17 @@ class BertNERModel(nn.Module):
 
 # Defining the model characteristics
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print (device)
 model = BertNERModel('bert-base-uncased', len(tag_encoder.classes_)).to(device)
 optimizer = optim.AdamW(model.parameters(), lr=5e-5)
+print("Starting Training")
 
 # Training using PyTorch and "CUDA"
 model.train()
-for epoch in range(15):  # Adjust the number of epochs as needed
+for epoch in range(3):  # Adjust the number of epochs as needed
     total_loss = 0
-    for batch in dataloader:
+    print(f"Starting Epoch {epoch + 1}")
+    for batch_idx, batch in enumerate(dataloader):
         input_ids, attention_mask, labels = [x.to(device) for x in batch]
 
         optimizer.zero_grad()
@@ -163,8 +169,11 @@ for epoch in range(15):  # Adjust the number of epochs as needed
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
+        if batch_idx % 10 == 0:
+            print(f"Epoch {epoch + 1}, Batch {batch_idx}, Loss: {loss.item()}")
 
     print(f"Epoch {epoch + 1}, Loss: {total_loss / len(dataloader)}")
+print("Finished Training")
 
 # Saving the model as a .pth file
 torch.save(model.state_dict(), model_name)
