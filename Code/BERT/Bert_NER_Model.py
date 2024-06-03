@@ -101,7 +101,7 @@ for paragraph in paragraphs:
         all_tags.append(tags)
 
 # Load pre-trained BERT tokenizer
-tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
+tokenizer = BertTokenizerFast.from_pretrained('bert-base-cased')
 
 # Define Dataset class
 class NERDataset(Dataset):
