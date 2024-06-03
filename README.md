@@ -13,9 +13,9 @@ sources like clinical records, scientific literature, and so on. </p>
 
 ## Part I) BiLSTM and RNN Architecture 
 
-## Problem Statement
+### Problem Statement
 
-### Dataset Used
+#### Dataset Used
 <p>The NCBI disease corpus is utilized for training and testing the NER model. This corpus contains annotated sentences with disease names, which serve as a research resource for the biomedical natural language processing community</p>
 <p>The Dataset files used are named as:</p>
 <ul>
@@ -24,7 +24,7 @@ sources like clinical records, scientific literature, and so on. </p>
 </ul>
 <p>These dataset files are accessible to all via the <a href = "https://www.ncbi.nlm.nih.gov/CBBresearch/Dogan/DISEASE/">NCBI Disease Portal</a>.
   
-### Objective
+#### Objective
 <p> The main objective of this project is to create a custom NER model using BiLSTM and RNN, which is powerful and robust enough to handle vast amounts of annotated biomedical texts. Thus, along with PyTorch and Cuda (to boost ), a BiLSTM architecture is used for increasing accuracy. </p>
 
 ## Procedure
