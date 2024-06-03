@@ -30,7 +30,7 @@ sources like clinical records, scientific literature, and so on. </p>
   
 ### Objective
 <p> The main objective of this project is to create a custom NER model using BiLSTM and RNN, which is powerful and robust enough to handle vast amounts of 
-annotated biomedical texts. Thus, along with PyTorch and Cuda (to improve the training time), a BiLSTM architecture is used for increasing accuracy. </p>
+annotated biomedical texts from the NCBI Disease Corpus. Thus, along with PyTorch and Cuda (to improve the training time), a BiLSTM architecture is used for increasing accuracy. </p>
 
 ## Procedure
 <ol>
@@ -126,9 +126,17 @@ Moreover, we use PyTorch and Cuda (for improving the training time).
   </ul>  
 </ol>
 
+## Conclusion
+<p>This project uses PyTorch and fine-tuning a BERT architecture for developing a NER model, specifically trained on biomedical data 
+from the NCBI Disease Corpus datasets. 
+The implementation of an LSTM-based architecture along with the preprocessing steps account for a model which achieves accurate identification and 
+classification of disease names, contributing to the advancement of biomedical NLP applications.</p>
+
 ## Potential Problems
 While using Pytorch's AdamW optimizer with a CrossEntropyLoss function (BertForTokenClassification in-built function), the loss function can 
 increase after a few epochs. This can be the result of the gradients becoming very small in the denominator, thus, increasing the training loss. 
 
+## Potential Solutions
+One solution can be to use a variant of the PyTorch's AdamW optimizer called "AMSGrad" which adds an extra step in the process. 
 ## System (Hardware) Specifications
 GPU: 6 GB Nvidia RTX 3070
