@@ -57,7 +57,7 @@ annotated biomedical texts. Thus, along with PyTorch and Cuda (to improve the tr
   <h3><li>Training the Model</li></h3>
   <ul>
     <li><b>Training Procedure:</b><p>The model is trained using the AdamW optimizer, and uses the CrossEntropy loss function, and is run only for a few epochs.
-    The model is then saved as "NER_Model.pth" in the main file directory.</p></li>
+    The model is then saved as "LSTM_NER_Model.pth" in the "Models" directory.</p></li>
   </ul>
 
   <h3><li>Evaluating Model</li></h3>
@@ -89,7 +89,42 @@ which serve as a research resource for the biomedical natural language processin
 ### Objective
 The main objective of this project is to fine-tune a "Bert-Base-Cased" model on medical text from the NCBI Disease Corpus Data sets and 
 annotated with a custom IO tagging scheme. The tags are based on the character limits as set up in the dataset. 
+The code processes the dataset, assigns annotations by tokenizing and assigning the tokens to the correct tags using the character limits
+and trains the NER model, and tests on a testing dataset. The loss functions and accuracy are calculated for the training process and testing 
+dataset respectively.
 Moreover, we use PyTorch and Cuda (for improving the training time).  
+
+## Procedure
+<ol>
+  <h3><li>Data Pre-processing</li></h3>
+  <ul>
+    <li><b>Dataset Parsing:</b><p>The training dataset files are parsed and the sentences and annotations are read, formatted and stored.</p></li>
+    <li><b>Data Tagging:</b><p>The sentences are broken down into tokens, which are then tagged on the basis of a custom IO tagging scheme and stored 
+    in a separate text file.</p></li>
+  </ul>
+
+  <h3><li>Datasert Class</li></h3>
+  <ul>
+    The 'BertNERTModel' class handles the conversion of sentences and tags to tensors which are then fed into the BERT model. 
+  </ul>
+
+  <h3><li>Defining the Model and Parameters</li></h3>
+  <ul>
+    <li><b>NERModel:</b><p>The 'BertNERModel' class defines the BERT-based NER model using the 'BertForTokenClassification' class from the transformers library.
+  </ul>
+
+  <h3><li>Training the Model</li></h3>
+  <ul>
+    <li><b>Training Procedure:</b><p>The model is trained using the AdamW optimizer, and uses the CrossEntropyLoss function, and is run only for a few epochs.
+    The model is then saved as "BERT_NER_Model.pth" in the "Models" directory.</p></li>
+  </ul>
+
+  <h3><li>Evaluating Model</li></h3>
+  <ul>
+    <li><b>Model Testing:</b><p>The model is then tested using the testing dataset. The results are then generated using the "Classification_Report" 
+    from the "sklearn" library and printed in the terminal window.</p></li>
+  </ul>  
+</ol>
 
 ## Potential Problems
 While using Pytorch's AdamW optimizer with a CrossEntropyLoss function (BertForTokenClassification in-built function), the loss function can 
