@@ -1,5 +1,5 @@
 # Importing the training model
-import Training_Model as tr_mod
+import Code.Training_Model as tr_mod
 import torch.utils.data
 from sklearn.metrics import classification_report
 
