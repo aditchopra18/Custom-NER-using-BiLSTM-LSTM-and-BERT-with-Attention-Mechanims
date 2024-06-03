@@ -9,7 +9,7 @@ from sklearn.preprocessing import LabelEncoder
 
 # Importing the relevant files
 train_file = 'Data/NCBItrainset_corpus.txt'
-model_name = 'BERT_NER_model.pth'
+model_name = 'Models/BERT_NER_model.pth'
 
 # Reading the dataset file
 def read_dataset(file_path):
