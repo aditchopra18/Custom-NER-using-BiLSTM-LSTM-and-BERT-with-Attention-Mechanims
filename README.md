@@ -1,8 +1,6 @@
-# Custom NER (Named Entity Recognition) Model with RNN and BiLSTM Architecture
+# Custom NER (Named Entity Recognition) Model with RNN and BiLSTM Architecture, fine-tuned BERT Architecture
 
-## Problem Statement
-
-### Introduction
+## Introduction
 <p> NER (Named Entity Recognition) is an important application of NLP (Natural Language Processing), which is used for the identification of different entites like people, geographic locations, dates, etc. 
 It is becoming popular in the medical community because of it's vast capabilities in identifying and extracting disease-like conditions, various symptoms, and pharmaceutical information in various information 
 sources like clinical records, scientific literature, and so on. </p>
@@ -12,6 +10,10 @@ sources like clinical records, scientific literature, and so on. </p>
   <li><b>Using Deep Learning Methods: </b> This includes using RNNs (Recurrent Neural Networks) and transformers for handling various dependencies within the training data.</li>
   <li><b>A mixture of both of these methods:</b> In order to meet the requirements of computational power, accuracy and efficiency, a mixture of both of these approaches might be used in order to balance these factors.</li>
 </ul>
+
+## Part I) BiLSTM and RNN Architecture 
+
+## Problem Statement
 
 ### Dataset Used
 <p>The NCBI disease corpus is utilized for training and testing the NER model. This corpus contains annotated sentences with disease names, which serve as a research resource for the biomedical natural language processing community</p>
@@ -23,8 +25,7 @@ sources like clinical records, scientific literature, and so on. </p>
 <p>These dataset files are accessible to all via the <a href = "https://www.ncbi.nlm.nih.gov/CBBresearch/Dogan/DISEASE/">NCBI Disease Portal</a>.
   
 ### Objective
-<p> The main objective of this project is to create a custom NER model, which is powerful and robust enough to handle vast amounts of annotated biomedical texts. Thus, along with PyTorch and Cuda, a BiLSTM 
-  architecture is used for increasing accuracy. </p>
+<p> The main objective of this project is to create a custom NER model using BiLSTM and RNN, which is powerful and robust enough to handle vast amounts of annotated biomedical texts. Thus, along with PyTorch and Cuda (to boost ), a BiLSTM architecture is used for increasing accuracy. </p>
 
 ## Procedure
 <ol>
@@ -57,5 +58,25 @@ sources like clinical records, scientific literature, and so on. </p>
 </ol>
 
 ## Conclusion
-<p>This project uses PyTorch and LSTM-based RNN for developing a NER model, specifically trained on biomedical data from the NCBI Disease Corpus datasets. The implementation of an LSTM-based architecture along with 
-  the preprocessing steps account for a model which achieves accurate identification and classification of disease names, contributing to the advancement of biomedical NLP applications.</p>
+<p>This project uses PyTorch and LSTM-based RNN for developing a NER model, specifically trained on biomedical data from the NCBI Disease Corpus datasets. 
+The implementation of an LSTM-based architecture along with the preprocessing steps account for a model which achieves accurate identification and 
+classification of disease names, contributing to the advancement of biomedical NLP applications.</p>
+
+## Part II) BiLSTM and RNN Architecture 
+
+## Problem Statement
+
+### Dataset Used
+<p>The NCBI disease corpus is utilized for training and testing the NER model. This corpus contains annotated sentences with disease names, which serve as a research resource for the biomedical natural language processing community</p>
+<p>The Dataset files used are named as:</p>
+<ul>
+  <li><b> Training Dataset: </b> <i>NCBItrainset_corpus.txt</i></li>
+  <li><b> Testing Dataset: </b> <i>NCBItestset_corpus.txt</i></li>
+</ul>
+<p>These dataset files are accessible to all via the <a href = "https://www.ncbi.nlm.nih.gov/CBBresearch/Dogan/DISEASE/">NCBI Disease Portal</a>.
+  
+### Objective
+
+
+## System (Hardware) Specifications
+GPU: 6 GB Nvidia RTX 3070
