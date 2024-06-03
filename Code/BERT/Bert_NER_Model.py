@@ -156,9 +156,9 @@ model = BertNERModel('bert-base-uncased', len(tag_encoder.classes_)).to(device)
 optimizer = optim.AdamW(model.parameters(), lr=5e-5)
 print("Starting Training")
 
-# Training using PyTorch and "CUDA"
+# Training using PyTorch, AdamW Optimizer, CrossEntropyLoss function and "CUDA"
 model.train()
-for epoch in range(3):  # Adjust the number of epochs as needed
+for epoch in range(3):
     total_loss = 0
     print(f"Starting Epoch {epoch + 1}")
     for batch_idx, batch in enumerate(dataloader):
