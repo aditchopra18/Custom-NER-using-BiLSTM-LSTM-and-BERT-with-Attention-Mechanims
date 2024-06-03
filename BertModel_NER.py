@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
-from transformers import BertTokenizerFast, BertForTokenClassification
+from transformers import BertTokenizerFast, BertModel
 import pandas as pd
 
 # Define important variables
@@ -74,13 +74,13 @@ def create_tag_maps(tagged_sentences):
     id2tag = {idx: tag for tag, idx in tag2id.items()}
     return tag2id, id2tag
 
-# Debug function to print unique labels and tag2id mapping
-def debug_labels_and_mapping(tag2id, labels):
-    print("Tag2ID Mapping:", tag2id)
-    unique_labels = set()
-    for label_list in labels:
-        unique_labels.update(label_list)
-    print("Unique Labels in Dataset:", unique_labels)
+# # Debug function to print unique labels and tag2id mapping
+# def debug_labels_and_mapping(tag2id, labels):
+#     print("Tag2ID Mapping:", tag2id)
+#     unique_labels = set()
+#     for label_list in labels:
+#         unique_labels.update(label_list)
+#     print("Unique Labels in Dataset:", unique_labels)
 
 class NERDataset(Dataset):
     def __init__(self, sentences, tags, tokenizer, max_len):
@@ -133,67 +133,76 @@ batch_size = 16
 train_dataset = NERDataset(all_sentences, all_tags, tokenizer, max_len)
 train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
 
-# Debugging: Check the collated batch
-batch = next(iter(train_dataloader))
-collated_batch = collate_fn([batch])
+# # Debugging: Check the collated batch
+# batch = next(iter(train_dataloader))
+# collated_batch = collate_fn([batch])
 
-print("\nCollated Batch:\n")
-print(collated_batch)
+# print("\nCollated Batch:\n")
+# print(collated_batch)
 
-# Check for invalid token IDs
-def check_token_ids(batch, vocab_size):
-    invalid_ids = (batch['input_ids'] >= vocab_size).nonzero(as_tuple=True)
-    if len(invalid_ids[0]) > 0:
-        print(f"Invalid token IDs found: {batch['input_ids'][invalid_ids]}")
-    else:
-        print("All token IDs are valid.")
+# # Check for invalid token IDs
+# def check_token_ids(batch, vocab_size):
+#     invalid_ids = (batch['input_ids'] >= vocab_size).nonzero(as_tuple=True)
+#     if len(invalid_ids[0]) > 0:
+#         print(f"Invalid token IDs found: {batch['input_ids'][invalid_ids]}")
+#     else:
+#         print("All token IDs are valid.")
 
-# Check token IDs in the collated batch
-vocab_size = tokenizer.vocab_size
-check_token_ids(collated_batch, vocab_size)
+# # Check token IDs in the collated batch
+# vocab_size = tokenizer.vocab_size
+# check_token_ids(collated_batch, vocab_size)
+
+# Define the model class
+class BertForNER(nn.Module):
+    def __init__(self, num_labels):
+        super(BertForNER, self).__init__()
+        self.bert = BertModel.from_pretrained('bert-base-uncased')
+        self.dropout = nn.Dropout(0.3)
+        self.classifier = nn.Linear(self.bert.config.hidden_size, num_labels)
+
+    def forward(self, input_ids, attention_mask=None, labels=None):
+        outputs = self.bert(input_ids, attention_mask=attention_mask)
+        sequence_output = self.dropout(outputs[0])
+        logits = self.classifier(sequence_output)
+
+        if labels is not None:
+            loss_fct = nn.CrossEntropyLoss(ignore_index=-100)
+            loss = loss_fct(logits.view(-1, self.classifier.out_features), labels.view(-1))
+            return (loss, logits)
+        else:
+            return logits
+
 
 # Initialize the model
-model = BertForTokenClassification.from_pretrained('bert-base-cased', num_labels=len(tag2id))
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model.to(device)
-
-# Define the loss function and optimizer
-criterion = nn.CrossEntropyLoss(ignore_index=-100)
+model = BertForNER(num_labels=len(tag2id)).to(device)
+# Define the optimizer
 optimizer = optim.AdamW(model.parameters(), lr=3e-5)
 
-# Check label ranges in the collated batch
-def check_label_ranges(batch, num_labels):
-    invalid_labels = (batch['labels'] >= num_labels).nonzero(as_tuple=True)
-    if len(invalid_labels[0]) > 0:
-        print(f"Invalid label IDs found: {batch['labels'][invalid_labels]}")
-    else:
-        print("All label IDs are valid.")
+def train_model(model, dataloader, optimizer, device, num_epochs=3):
+    model.train()
+    for epoch in range(num_epochs):
+        total_loss = 0
+        for batch in dataloader:
+            input_ids = batch['input_ids'].to(device)
+            attention_mask = batch['attention_mask'].to(device)
+            labels = batch['labels'].to(device)
+            
+            model.zero_grad()
+            
+            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+            loss = outputs[0]
+            
+            loss.backward()
+            optimizer.step()
+            
+            total_loss += loss.item()
+        
+        avg_loss = total_loss / len(dataloader)
+        print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {avg_loss}")
 
-check_label_ranges(collated_batch, len(tag2id))
+# Train the model
+train_model(model, train_dataloader, optimizer, device, num_epochs=3)
 
-# Training the model
-model.train()
-for epoch in range(20):
-    total_loss = 0
-    for batch in train_dataloader:
-        optimizer.zero_grad()
-        input_ids = batch['input_ids'].squeeze(0).to(device)
-        attention_mask = batch['attention_mask'].squeeze(0).to(device)
-        labels = batch['labels'].squeeze(0).to(device)
-
-        # Debug: Check if any label is out of the range of tag2id
-        invalid_label_indices = (labels >= len(tag2id)).nonzero(as_tuple=True)
-        if len(invalid_label_indices[0]) > 0:
-            print(f"Invalid label indices found in batch: {labels[invalid_label_indices]}")
-            continue
-
-        outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-        loss = outputs.loss
-        loss.backward()
-        optimizer.step()
-        total_loss += loss.item()
-
-    print(f"Epoch {epoch + 1}, Loss: {total_loss / len(train_dataloader)}")
-
-# Save the model as a .pth file
+# Save the trained model
 torch.save(model.state_dict(), trained_model)
