@@ -6,6 +6,7 @@ import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 from transformers import BertTokenizerFast, BertForTokenClassification
 from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import classification_report
 
 # Importing the relevant files
 train_file = 'Data/NCBItrainset_corpus.txt'
@@ -177,3 +178,19 @@ print("Finished Training")
 
 # Saving the model as a .pth file
 torch.save(model.state_dict(), model_name)
+
+# Testing the model on the testing dataset
+# Load the test dataset
+test_file = '../../Data/NCBItestset_corpus.txt'
+test_lines = read_dataset(test_file)
+test_paragraphs = parse_dataset(test_lines)
+
+test_sentences = []
+test_tags = []
+
+for paragraph in test_paragraphs:
+    sentences, annotations = parse_paragraph(paragraph)
+    tagged_sentences = tag_annotations(sentences, annotations)
+    for sentence, tags in tagged_sentences:
+        test_sentences.append(sentence)
+        test_tags.append(tags)

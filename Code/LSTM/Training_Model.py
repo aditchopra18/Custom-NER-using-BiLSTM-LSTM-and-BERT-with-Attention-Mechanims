@@ -7,8 +7,8 @@ from torch.utils.data import Dataset, DataLoader
 from sklearn.preprocessing import LabelEncoder
 
 # Importing the relevant files
-train_file = 'Data/NCBItrainset_corpus.txt'
-model_name = 'Models/LSTM_NER_model.pth'
+train_file = '../../Data/NCBItrainset_corpus.txt'
+model_name = '../../Models/LSTM_NER_model.pth'
 
 # Reading the dataset file
 def read_dataset(file_path):
