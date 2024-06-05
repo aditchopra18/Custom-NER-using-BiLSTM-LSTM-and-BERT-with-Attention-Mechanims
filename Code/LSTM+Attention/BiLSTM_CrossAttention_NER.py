@@ -157,7 +157,7 @@ scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3, f
 scaler = torch.cuda.amp.GradScaler()
 
 # Training the Model
-for epoch in range(50):
+for epoch in range(40):
     model.train()
     total_loss = 0
     for batch in dataloader:

@@ -154,7 +154,7 @@ class BertNERModel(nn.Module):
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print (device)
 model = BertNERModel('bert-base-uncased', len(tag_encoder.classes_)).to(device)
-optimizer = optim.AdamW(model.parameters(), lr=5e-5)
+optimizer = optim.AdamW(model.parameters(), lr=1e-5)
 print("Starting Training")
 
 # Training using PyTorch, AdamW Optimizer, CrossEntropyLoss function and "CUDA"
@@ -176,12 +176,12 @@ for epoch in range(3):
     print(f"Epoch {epoch + 1}, Loss: {total_loss / len(dataloader)}")
 print("Finished Training")
 
-# Saving the model as a .pth file
+# Saving the model
 torch.save(model.state_dict(), model_name)
 
 # Testing the model on the testing dataset
 # Load the test dataset
-test_file = '../../Data/NCBItestset_corpus.txt'
+test_file = 'Data/NCBItestset_corpus.txt'
 test_lines = read_dataset(test_file)
 test_paragraphs = parse_dataset(test_lines)
 
@@ -194,3 +194,37 @@ for paragraph in test_paragraphs:
     for sentence, tags in tagged_sentences:
         test_sentences.append(sentence)
         test_tags.append(tags)
+
+# Prepare test data
+test_dataset = NERDataset(test_sentences, test_tags, tokenizer, tag_encoder)
+test_dataloader = DataLoader(test_dataset, batch_size=16, shuffle=False)
+
+# Load the saved model
+model.load_state_dict(torch.load(model_name))
+model.eval()
+
+all_true_labels = []
+all_pred_labels = []
+
+# Evaluate the model
+with torch.no_grad():
+    for batch in test_dataloader:
+        input_ids, attention_mask, labels = [x.to(device) for x in batch]
+
+        _, outputs = model(input_ids, attention_mask)
+
+        active_logits = outputs.view(-1, model.bert.num_labels)
+        active_labels = labels.view(-1)
+        active_predictions = torch.argmax(active_logits, axis=1)
+
+        active_indices = active_labels != -100
+
+        all_true_labels.extend(active_labels[active_indices].cpu().numpy())
+        all_pred_labels.extend(active_predictions[active_indices].cpu().numpy())
+
+# Decode labels
+true_labels = tag_encoder.inverse_transform(all_true_labels)
+pred_labels = tag_encoder.inverse_transform(all_pred_labels)
+
+# Print the classification report
+print(classification_report(true_labels, pred_labels))
