@@ -5,10 +5,12 @@ import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report
+import pandas as pd
+import numpy as np
+from sklearn.utils import class_weight
 
 # Importing the relevant files
 train_file = '../../Data/NCBItrainset_corpus.txt'
-dev_file = '../../Data/NCBIdevelopset_corpus.txt'
 model_name = '../../Models/BiLSTM_CrossAttention_NER_model.pth'
 
 # Reading and parsing the dataset file
@@ -73,17 +75,6 @@ for paragraph in paragraphs:
         all_sentences.append(sentence)
         all_tags.append(tag)
 
-# Prepare development data
-dev_lines = read_dataset(dev_file)
-dev_paragraphs = parse_dataset(dev_lines)
-dev_sentences, dev_tags = [], []
-for paragraph in dev_paragraphs:
-    s, a = parse_paragraph(paragraph)
-    tagged_sentences = tag_annotations(s, a)
-    for sentence, tag in tagged_sentences:
-        dev_sentences.append(sentence)
-        dev_tags.append(tag)
-
 class LSTM_Attention_NERDataset(Dataset):
     def __init__(self, sentences, tags, word_encoder, tag_encoder, unknown_token='<UNK>'):
         self.sentences = sentences
@@ -111,6 +102,9 @@ word_encoder[unknown_token] = len(word_encoder)
 
 tag_encoder = LabelEncoder()
 tag_encoder.fit(all_tags_flat)
+
+# Store sentences and tags in DataFrame
+df = pd.DataFrame({'sentence': all_sentences, 'tags': all_tags})
 
 dataset = LSTM_Attention_NERDataset(all_sentences, all_tags, word_encoder, tag_encoder, unknown_token)
 dataloader = DataLoader(dataset, batch_size=32, shuffle=True, collate_fn=lambda x: x)
@@ -148,8 +142,15 @@ class BiLSTM_CrossAttention_NER_Model(nn.Module):
         return tag_space
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# Flatten tags for computing class weights
+flattened_tags = [tag for sublist in df['tags'] for tag in sublist]
+class_weights = class_weight.compute_class_weight('balanced', classes=np.unique(flattened_tags), y=flattened_tags)
+class_weights_dict = {tag: weight for tag, weight in zip(np.unique(flattened_tags), class_weights)}
+class_weights_tensor = torch.tensor([class_weights_dict[tag] for tag in tag_encoder.classes_], dtype=torch.float).to(device)
+
 model = BiLSTM_CrossAttention_NER_Model(len(word_encoder), len(tag_encoder.classes_)).to(device)
-criterion = nn.CrossEntropyLoss(ignore_index=-100)
+criterion = nn.CrossEntropyLoss(weight=class_weights_tensor, ignore_index=-100)
 optimizer = optim.AdamW(model.parameters(), lr=0.001)
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3, factor=0.5)
 
@@ -182,3 +183,63 @@ for epoch in range(40):
     print(f"Epoch {epoch + 1}, Loss: {avg_loss:.4f}")
 
 torch.save(model.state_dict(), model_name)
+
+# Testing the model, and evaluating the f1 score
+test_file = 'NCBItestset_corpus.txt'
+test_lines = read_dataset(test_file)
+test_paragraphs = parse_dataset(test_lines)
+
+# Parsing and storing the test dataset
+test_sentences = []
+test_tags = []
+
+for paragraph in test_paragraphs:
+    sentences, annotations = parse_paragraph(paragraph)
+    tagged_sentences = tag_annotations(sentences, annotations)
+    for sentence, tags in tagged_sentences:
+        test_sentences.append(sentence)
+        test_tags.append(tags)
+
+# Importing the model file
+model = BiLSTM_CrossAttention_NER_Model(len(word_encoder), len(tag_encoder.classes_)).to(device)
+model.load_state_dict(torch.load(model_name))
+model.eval()
+
+# Prepare the test data
+test_dataset = LSTM_Attention_NERDataset(test_sentences, test_tags, word_encoder, tag_encoder, '<UNK>')
+test_dataloader = DataLoader(test_dataset, batch_size=16, shuffle=False, collate_fn=lambda x: x)
+
+# Evaluate the model
+all_true_labels = []
+all_pred_labels = []
+
+result = "../../Result/TestResults_CrossAttention_BiLSTM_NER.txt"
+with open(result, 'w') as t_file:
+    with torch.no_grad():
+        for batch in test_dataloader:
+            sentences, tags = zip(*batch)
+            sentences = torch.nn.utils.rnn.pad_sequence(sentences, batch_first=True).to(device)
+            tags = torch.nn.utils.rnn.pad_sequence(tags, batch_first=True, padding_value=-100).to(device)
+
+            outputs = model(sentences)
+            outputs = outputs.view(-1, outputs.shape[-1])
+            tags = tags.view(-1)
+
+            predictions = torch.argmax(outputs, dim=1).cpu().numpy()
+            true_labels = tags.cpu().numpy()
+
+            mask = true_labels != -100
+            pred_labels = predictions[mask]
+            true_labels = true_labels[mask]
+
+            pred_labels_decoded = tag_encoder.inverse_transform(pred_labels)
+            true_labels_decoded = tag_encoder.inverse_transform(true_labels)
+
+            for true_label, pred_label in zip(true_labels_decoded, pred_labels_decoded):
+                t_file.write(f'True: {true_label}, Pred: {pred_label}\n')
+                all_true_labels.append(true_label)
+                all_pred_labels.append(pred_label)
+
+# Printing classification report
+report = classification_report(all_true_labels, all_pred_labels)
+print(report)
