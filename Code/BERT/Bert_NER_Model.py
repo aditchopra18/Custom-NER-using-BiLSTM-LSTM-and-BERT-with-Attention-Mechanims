@@ -7,6 +7,8 @@ from torch.utils.data import Dataset, DataLoader
 from transformers import BertTokenizerFast, BertForTokenClassification
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report
+from sklearn.utils.class_weight import compute_class_weight
+import numpy as np
 
 # Importing the relevant files
 train_file = 'Data/NCBItrainset_corpus.txt'
@@ -137,29 +139,45 @@ all_tags_flat = [tag for tags in all_tags for tag in tags]
 tag_encoder = LabelEncoder()
 tag_encoder.fit(all_tags_flat)
 
+# Calculate class weights
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+classes = tag_encoder.classes_
+class_weights = compute_class_weight(class_weight='balanced', classes=classes, y=all_tags_flat)
+class_weights = torch.tensor(class_weights, dtype=torch.float).to(device)
+
 dataset = NERDataset(all_sentences, all_tags, tokenizer, tag_encoder)
 dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
 
-# Define BERT-based NER Model
+# Define BERT-based NER Model with weighted loss
 class BertNERModel(nn.Module):
-    def __init__(self, model_name, num_labels):
+    def __init__(self, model_name, num_labels, class_weights):
         super(BertNERModel, self).__init__()
         self.bert = BertForTokenClassification.from_pretrained(model_name, num_labels=num_labels)
+        self.dropout = nn.Dropout(0.3)  # Add dropout layer
+        self.class_weights = class_weights
 
     def forward(self, input_ids, attention_mask, labels=None):
         output = self.bert(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
-        return output.loss, output.logits
+        logits = self.dropout(output.logits)  # Apply dropout
+        if labels is not None:
+            loss_fct = nn.CrossEntropyLoss(weight=self.class_weights, ignore_index=-100)
+            loss = loss_fct(logits.view(-1, self.bert.config.num_labels), labels.view(-1))
+            return loss, logits
+        return logits
 
 # Defining the model characteristics
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print (device)
-model = BertNERModel('bert-base-uncased', len(tag_encoder.classes_)).to(device)
-optimizer = optim.AdamW(model.parameters(), lr=1e-5)
-print("Starting Training")
+print(device)
+
+model = BertNERModel('bert-base-uncased', len(tag_encoder.classes_), class_weights).to(device)
+optimizer = optim.AdamW(model.parameters(), lr=5e-5)
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=2, verbose=True)
 
 # Training using PyTorch, AdamW Optimizer, CrossEntropyLoss function and "CUDA"
 model.train()
-for epoch in range(3):
+num_epochs = 10
+max_grad_norm = 1.0  # Gradient clipping
+
+for epoch in range(num_epochs):
     total_loss = 0
     print(f"Starting Epoch {epoch + 1}")
     for batch_idx, batch in enumerate(dataloader):
@@ -168,12 +186,15 @@ for epoch in range(3):
         optimizer.zero_grad()
         loss, outputs = model(input_ids, attention_mask, labels)
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)  # Clip gradients
         optimizer.step()
         total_loss += loss.item()
         if batch_idx % 10 == 0:
             print(f"Epoch {epoch + 1}, Batch {batch_idx}, Loss: {loss.item()}")
 
-    print(f"Epoch {epoch + 1}, Loss: {total_loss / len(dataloader)}")
+    avg_loss = total_loss / len(dataloader)
+    scheduler.step(avg_loss)  # Adjust learning rate based on average loss
+    print(f"Epoch {epoch + 1}, Loss: {avg_loss}")
 print("Finished Training")
 
 # Saving the model
@@ -211,9 +232,8 @@ with torch.no_grad():
     for batch in test_dataloader:
         input_ids, attention_mask, labels = [x.to(device) for x in batch]
 
-        _, outputs = model(input_ids, attention_mask)
-
-        active_logits = outputs.view(-1, model.bert.num_labels)
+        outputs = model(input_ids, attention_mask)
+        active_logits = outputs.view(-1, model.bert.config.num_labels)
         active_labels = labels.view(-1)
         active_predictions = torch.argmax(active_logits, axis=1)
 
