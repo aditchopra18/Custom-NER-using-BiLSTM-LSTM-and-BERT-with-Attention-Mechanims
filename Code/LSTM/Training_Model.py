@@ -54,7 +54,6 @@ def parse_paragraph(paragraph):
 # Data Labelling
 def tag_annotations(sentences, annotations):
     tagged_sentences = []
-    char_count = 0
 
     for sentence in sentences:
         tags = ['O'] * len(sentence)  # Set tags at "O"
