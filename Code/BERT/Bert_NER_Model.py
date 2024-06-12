@@ -11,8 +11,10 @@ from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
 
 # Importing the relevant files
-train_file = 'Data/NCBItrainset_corpus.txt'
-model_name = 'Models/BERT_NER_model.pth'
+train_file = 'NCBItrainset_corpus.txt'
+dev_file = 'NCBIdevelopset_corpus.txt'
+test_file = 'NCBItestset_corpus.txt'
+model_name = 'BERT_NER_model.pth'
 
 # Reading the dataset file
 def read_dataset(file_path):
@@ -103,6 +105,20 @@ for paragraph in paragraphs:
         all_sentences.append(sentence)
         all_tags.append(tags)
 
+# Parsing the validation dataset file
+dev_lines = read_dataset(dev_file)
+dev_paragraphs = parse_dataset(dev_lines)
+
+dev_all_sentences = []
+dev_all_tags = []
+
+for dev_paragraph in dev_paragraphs:
+    dev_sentences, dev_annotations = parse_paragraph(dev_paragraph)
+    dev_tagged_sentences = tag_annotations(dev_sentences, dev_annotations)
+    for dev_sentence, dev_tags in dev_tagged_sentences:
+        dev_all_sentences.append(dev_sentence)
+        dev_all_tags.append(dev_tags)
+
 # Load pre-trained BERT tokenizer
 tokenizer = BertTokenizerFast.from_pretrained('bert-base-cased')
 
@@ -141,6 +157,7 @@ tag_encoder.fit(all_tags_flat)
 
 # Calculate class weights
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
 classes = tag_encoder.classes_
 class_weights = compute_class_weight(class_weight='balanced', classes=classes, y=all_tags_flat)
 class_weights = torch.tensor(class_weights, dtype=torch.float).to(device)
@@ -166,19 +183,20 @@ class BertNERModel(nn.Module):
         return logits
 
 # Defining the model characteristics
-print(device)
 
 model = BertNERModel('bert-base-uncased', len(tag_encoder.classes_), class_weights).to(device)
 optimizer = optim.AdamW(model.parameters(), lr=5e-5)
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=2, verbose=True)
+scaler = optim.cuda.amp.GradScaler()
 
 # Training using PyTorch, AdamW Optimizer, CrossEntropyLoss function and "CUDA"
 model.train()
 num_epochs = 10
-max_grad_norm = 1.0  # Gradient clipping
 
 for epoch in range(num_epochs):
     total_loss = 0
+    total_valid_loss = 0
+
     print(f"Starting Epoch {epoch + 1}")
     for batch_idx, batch in enumerate(dataloader):
         input_ids, attention_mask, labels = [x.to(device) for x in batch]
@@ -186,15 +204,18 @@ for epoch in range(num_epochs):
         optimizer.zero_grad()
         loss, outputs = model(input_ids, attention_mask, labels)
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)  # Clip gradients
         optimizer.step()
+
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
+        
         total_loss += loss.item()
-        if batch_idx % 10 == 0:
-            print(f"Epoch {epoch + 1}, Batch {batch_idx}, Loss: {loss.item()}")
+        print(f"Batch: {batch}, Batch ID: {batch_idx}, Loss: {loss.item()}")
 
     avg_loss = total_loss / len(dataloader)
     scheduler.step(avg_loss)  # Adjust learning rate based on average loss
-    print(f"Epoch {epoch + 1}, Loss: {avg_loss}")
+    print(f"Epoch: {epoch + 1}, Loss: {avg_loss}")
 print("Finished Training")
 
 # Saving the model
@@ -202,7 +223,6 @@ torch.save(model.state_dict(), model_name)
 
 # Testing the model on the testing dataset
 # Load the test dataset
-test_file = 'Data/NCBItestset_corpus.txt'
 test_lines = read_dataset(test_file)
 test_paragraphs = parse_dataset(test_lines)
 

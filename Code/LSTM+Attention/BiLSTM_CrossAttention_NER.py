@@ -2,16 +2,19 @@ import re
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch.utils.data
 from torch.utils.data import Dataset, DataLoader
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report
-import pandas as pd
-import numpy as np
-from sklearn.utils import class_weight
+import matplotlib.pyplot as plt
+from collections import Counter
+# from sklearn.model_selection import KFold
 
 # Importing the relevant files
-train_file = '../../Data/NCBItrainset_corpus.txt'
+train_file = 'NCBItrainset_corpus.txt'
+dev_file = 'NCBIdevelopset_corpus.txt'
 model_name = '../../Models/BiLSTM_CrossAttention_NER_model.pth'
+unknown_token = "<UNK>"
 
 # Reading and parsing the dataset file
 def read_dataset(file_path):
@@ -64,7 +67,7 @@ def tag_annotations(sentences, annotations):
         tagged_sentences.append((sentence, tags))
     return tagged_sentences
 
-# Prepare the data
+# Prepare the training and validation data
 lines = read_dataset(train_file)
 paragraphs = parse_dataset(lines)
 all_sentences, all_tags = [], []
@@ -75,6 +78,16 @@ for paragraph in paragraphs:
         all_sentences.append(sentence)
         all_tags.append(tag)
 
+dev_lines = read_dataset(dev_file)
+dev_paragraphs = parse_dataset(dev_lines)
+dev_all_sentences, dev_all_tags = [], []
+for dev_paragraph in dev_paragraphs:
+    dev_s, dev_a = parse_paragraph(dev_paragraph)
+    dev_tagged_sentences = tag_annotations(dev_s, dev_a)
+    for dev_sentence, dev_tag in dev_tagged_sentences:
+        dev_all_sentences.append(dev_sentence)
+        dev_all_tags.append(dev_tag)
+
 class LSTM_Attention_NERDataset(Dataset):
     def __init__(self, sentences, tags, word_encoder, tag_encoder, unknown_token='<UNK>'):
         self.sentences = sentences
@@ -83,31 +96,42 @@ class LSTM_Attention_NERDataset(Dataset):
         self.tag_encoder = tag_encoder
         self.unknown_token = unknown_token
 
+        self.unknown_token_count = 0  # Counter for unknown tokens
+        self.unknown_tokens = []  # List to store unknown words and their tags
+
     def __len__(self):
         return len(self.sentences)
 
     def __getitem__(self, idx):
         sentence = self.sentences[idx]
         tags = self.tags[idx]
-        sentence_encoded = [self.word_encoder.get(word, self.word_encoder[self.unknown_token]) for word in sentence]
-        tags_encoded = self.tag_encoder.transform(tags)
-        return torch.tensor(sentence_encoded), torch.tensor(tags_encoded, dtype=torch.long)
+        word_indices = []
+        unknown_tokens_in_sentence = []
+        for word, tag in zip(sentence, tags):
+            if word in self.word_encoder.classes_:
+                word_indices.append(self.word_encoder.transform([word])[0])
+            else:
+                word_indices.append(self.word_encoder.transform([self.unknown_token])[0])
+                self.unknown_token_count += 1  # Increment counter for unknown tokens
+                unknown_tokens_in_sentence.append((word, tag))
+        self.unknown_tokens.extend(unknown_tokens_in_sentence)  # Add unknown tokens to the list
+        tag_indices = self.tag_encoder.transform(tags)
+        return torch.tensor(word_indices, dtype=torch.long), torch.tensor(tag_indices, dtype=torch.long)
 
-all_words = [word for sentence in all_sentences for word in sentence]
+all_words = [word for sentence in all_sentences for word in sentence] + [unknown_token]
 all_tags_flat = [tag for tags in all_tags for tag in tags]
 
-word_encoder = {word: idx for idx, word in enumerate(set(all_words))}
-unknown_token = '<UNK>'
-word_encoder[unknown_token] = len(word_encoder)
+word_encoder = LabelEncoder()
+word_encoder.fit(all_words)
 
 tag_encoder = LabelEncoder()
 tag_encoder.fit(all_tags_flat)
 
-# Store sentences and tags in DataFrame
-df = pd.DataFrame({'sentence': all_sentences, 'tags': all_tags})
-
 dataset = LSTM_Attention_NERDataset(all_sentences, all_tags, word_encoder, tag_encoder, unknown_token)
 dataloader = DataLoader(dataset, batch_size=32, shuffle=True, collate_fn=lambda x: x)
+
+dev_dataset = LSTM_Attention_NERDataset(dev_all_sentences, dev_all_tags, word_encoder, tag_encoder, unknown_token)
+dev_dataloader = DataLoader(dev_dataset, batch_size=32, shuffle=True, collate_fn=lambda x: x)
 
 class CrossAttention(nn.Module):
     def __init__(self, hidden_dim):
@@ -127,41 +151,75 @@ class CrossAttention(nn.Module):
         return context
 
 class BiLSTM_CrossAttention_NER_Model(nn.Module):
-    def __init__(self, vocab_size, tagset_size, embedding_dim=128, hidden_dim=128):
+    def __init__(self, vocab_size, tagset_size, embedding_dim=128, hidden_dim=128, dropout_prob=0.3):
         super(BiLSTM_CrossAttention_NER_Model, self).__init__()
         self.embedding = nn.Embedding(vocab_size, embedding_dim)
-        self.bilstm = nn.LSTM(embedding_dim, hidden_dim, batch_first=True, bidirectional=True)
+        self.batch_norm_emb = nn.BatchNorm1d(embedding_dim)
+        self.bilstm = nn.LSTM(embedding_dim, hidden_dim, num_layers=2, batch_first=True, bidirectional=True, dropout=dropout_prob)
         self.cross_attention = CrossAttention(hidden_dim * 2)
+        self.batch_norm_att = nn.BatchNorm1d(hidden_dim * 2)
+        self.dropout = nn.Dropout(dropout_prob)
         self.fc = nn.Linear(hidden_dim * 2, tagset_size)
 
     def forward(self, x):
         emb = self.embedding(x)
+        emb = self.batch_norm_emb(emb.transpose(1, 2)).transpose(1, 2)
+        emb = self.dropout(emb)
+        
         bilstm_out, _ = self.bilstm(emb)
+        bilstm_out = self.dropout(bilstm_out)
+        
         cross_att_out = self.cross_attention(bilstm_out, bilstm_out, bilstm_out)
+        cross_att_out = self.batch_norm_att(cross_att_out.transpose(1, 2)).transpose(1, 2)
+        cross_att_out = self.dropout(cross_att_out)
+        
         tag_space = self.fc(cross_att_out)
         return tag_space
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
+# kf = KFold(n_splits=5, shuffle=True, random_state=42)
+# all_sentences = list(all_sentences)
+# all_tags = list(all_tags)
 
-# Flatten tags for computing class weights
-flattened_tags = [tag for sublist in df['tags'] for tag in sublist]
-class_weights = class_weight.compute_class_weight('balanced', classes=np.unique(flattened_tags), y=flattened_tags)
-class_weights_dict = {tag: weight for tag, weight in zip(np.unique(flattened_tags), class_weights)}
-class_weights_tensor = torch.tensor([class_weights_dict[tag] for tag in tag_encoder.classes_], dtype=torch.float).to(device)
+# Function for plotting (to be used to visualize the training loss and validation loss)
+# Used to figure if the model is underfitting or overfitting
+def graph_plot(title, x_label, y_label, x_data, y_data, z_data, color = 'blue', linestyle = '-'):
+    plt.plot(x_data, y_data, color = color, linestyle = linestyle)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.title(title)
+    plt.plot(x_data, z_data, color = 'r', linestyle = '-')
+    plt.legend()
+    plt.savefig("../../Graphs/aBiLSTM_CrossAttention.png", bbox_inches = 'tight')
 
-model = BiLSTM_CrossAttention_NER_Model(len(word_encoder), len(tag_encoder.classes_)).to(device)
-criterion = nn.CrossEntropyLoss(weight=class_weights_tensor, ignore_index=-100)
+
+train_dataset = LSTM_Attention_NERDataset(all_sentences, all_tags, word_encoder, tag_encoder, unknown_token)
+val_dataset = LSTM_Attention_NERDataset(dev_all_sentences, dev_all_tags, word_encoder, tag_encoder, unknown_token)
+
+train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True, collate_fn=lambda x: x)
+val_dataloader = DataLoader(val_dataset, batch_size=32, shuffle=False, collate_fn=lambda x: x)
+print(train_dataloader)
+model = BiLSTM_CrossAttention_NER_Model(len(word_encoder.classes_), len(tag_encoder.classes_)).to(device)
+criterion = nn.CrossEntropyLoss(ignore_index=-100) 
 optimizer = optim.AdamW(model.parameters(), lr=0.001)
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3, factor=0.5)
-
-# Mixed Precision Training
 scaler = torch.cuda.amp.GradScaler()
 
-# Training the Model
+model.train()
+loss_dic = {}
+valid_loss_dic = {}
+
+print("Starting Training\n")
 for epoch in range(40):
-    model.train()
     total_loss = 0
-    for batch in dataloader:
+    total_valid_loss = 0
+
+    print (f'Epoch: {epoch + 1}')
+    for batch_idx, batch in enumerate(train_dataloader):
+        # Debugging print statement
+        print(f"Epoch {epoch + 1}, Batch {batch_idx + 1}/{len(train_dataloader)}")
+
         sentences, tags = zip(*batch)
         sentences = torch.nn.utils.rnn.pad_sequence(sentences, batch_first=True).to(device)
         tags = torch.nn.utils.rnn.pad_sequence(tags, batch_first=True, padding_value=-100).to(device)
@@ -177,69 +235,31 @@ for epoch in range(40):
         scaler.step(optimizer)
         scaler.update()
         total_loss += loss.item()
-    
-    avg_loss = total_loss / len(dataloader)
-    scheduler.step(avg_loss)
-    print(f"Epoch {epoch + 1}, Loss: {avg_loss:.4f}")
 
-torch.save(model.state_dict(), model_name)
+    avg_train_loss = total_loss / len(train_dataloader)
 
-# Testing the model, and evaluating the f1 score
-test_file = 'NCBItestset_corpus.txt'
-test_lines = read_dataset(test_file)
-test_paragraphs = parse_dataset(test_lines)
-
-# Parsing and storing the test dataset
-test_sentences = []
-test_tags = []
-
-for paragraph in test_paragraphs:
-    sentences, annotations = parse_paragraph(paragraph)
-    tagged_sentences = tag_annotations(sentences, annotations)
-    for sentence, tags in tagged_sentences:
-        test_sentences.append(sentence)
-        test_tags.append(tags)
-
-# Importing the model file
-model = BiLSTM_CrossAttention_NER_Model(len(word_encoder), len(tag_encoder.classes_)).to(device)
-model.load_state_dict(torch.load(model_name))
-model.eval()
-
-# Prepare the test data
-test_dataset = LSTM_Attention_NERDataset(test_sentences, test_tags, word_encoder, tag_encoder, '<UNK>')
-test_dataloader = DataLoader(test_dataset, batch_size=16, shuffle=False, collate_fn=lambda x: x)
-
-# Evaluate the model
-all_true_labels = []
-all_pred_labels = []
-
-result = "../../Result/TestResults_CrossAttention_BiLSTM_NER.txt"
-with open(result, 'w') as t_file:
     with torch.no_grad():
-        for batch in test_dataloader:
-            sentences, tags = zip(*batch)
-            sentences = torch.nn.utils.rnn.pad_sequence(sentences, batch_first=True).to(device)
-            tags = torch.nn.utils.rnn.pad_sequence(tags, batch_first=True, padding_value=-100).to(device)
+        for val_batch_idx, val_batch in enumerate(val_dataloader):
+            # Debugging print statement
+            print(f"Validation Batch {val_batch_idx + 1}/{len(val_dataloader)}")
 
-            outputs = model(sentences)
-            outputs = outputs.view(-1, outputs.shape[-1])
-            tags = tags.view(-1)
+            val_sentences, val_tags = zip(*val_batch)
+            val_sentences = torch.nn.utils.rnn.pad_sequence(val_sentences, batch_first=True).to(device)
+            val_tags = torch.nn.utils.rnn.pad_sequence(val_tags, batch_first=True, padding_value=-100).to(device)
 
-            predictions = torch.argmax(outputs, dim=1).cpu().numpy()
-            true_labels = tags.cpu().numpy()
+            with torch.cuda.amp.autocast():
+                val_outputs = model(val_sentences)
+                val_outputs = val_outputs.view(-1, val_outputs.shape[-1])
+                val_tags = val_tags.view(-1)
+                valid_loss = criterion(val_outputs, val_tags)
+                total_valid_loss += valid_loss.item()
+        
+    avg_valid_loss = total_valid_loss / len(val_dataloader)
 
-            mask = true_labels != -100
-            pred_labels = predictions[mask]
-            true_labels = true_labels[mask]
+    scheduler.step(avg_train_loss)
 
-            pred_labels_decoded = tag_encoder.inverse_transform(pred_labels)
-            true_labels_decoded = tag_encoder.inverse_transform(true_labels)
+    print(f"Epoch {epoch + 1}, Average Training Loss: {avg_train_loss:.4f}, Validation Loss: {avg_valid_loss:.4f}")
+    loss_dic[epoch] = avg_train_loss
+    valid_loss_dic[epoch] = avg_valid_loss
 
-            for true_label, pred_label in zip(true_labels_decoded, pred_labels_decoded):
-                t_file.write(f'True: {true_label}, Pred: {pred_label}\n')
-                all_true_labels.append(true_label)
-                all_pred_labels.append(pred_label)
-
-# Printing classification report
-report = classification_report(all_true_labels, all_pred_labels)
-print(report)
+    torch.save(model.state_dict(), model_name)
